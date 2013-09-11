@@ -12,6 +12,7 @@ Ground rules
 ------------
 1. We use a template instead of `h2xs`.
 2. We do not bundle an additional C library.
+3. We assume you have at least Perl 5.14.2.
 
 These are the best advices I've received so far and they've proven to be
 crucial.
@@ -28,6 +29,9 @@ might go over it at some point but makes no promises.
 
 Eliminating the use of `h2xs` and bundling any C libraries we use (that
 we haven't wrote by ourselves) remove a lot of needless complexity.
+
+Perl 5.14.2 is prevalent enough to consider it a starting ground, though at
+this point it is not yet necessarily important.
 
 Relevant resources
 ------------------
