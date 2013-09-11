@@ -35,17 +35,19 @@ this point it is not yet necessarily important.
 
 Relevant resources
 ------------------
-perlxs.pod (`perldoc perlxs`)
-perlapi.pod (`perldoc perlapi`)
+
+* perlxs.pod (`perldoc perlxs`)
+* perlapi.pod (`perldoc perlapi`)
 
 More advanced or specialized resources
 --------------------------------------
-perlhack.pod (`perldoc perlhack`)
-perlhacktips.pod (`perldoc perlhacktips`)
-perlhacktut.pod (`perldoc perlhacktut`)
-perlguts.pod (`perldoc perlguts`)
-perlintern.pod (`perldoc perlintern`)
-perlinterp.pod (`perldoc perlinterp`)
-perlcall.pod (`perldoc perlcall`)
-perlsource.pod (`perldoc perlsource`)
+
+* perlhack.pod (`perldoc perlhack`)
+* perlhacktips.pod (`perldoc perlhacktips`)
+* perlhacktut.pod (`perldoc perlhacktut`)
+* perlguts.pod (`perldoc perlguts`)
+* perlintern.pod (`perldoc perlintern`)
+* perlinterp.pod (`perldoc perlinterp`)
+* perlcall.pod (`perldoc perlcall`)
+* perlsource.pod (`perldoc perlsource`)
 
