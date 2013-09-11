@@ -1,0 +1,47 @@
+XS Fun
+======
+
+Any XS guru will tell you XS is easy. I've heard this many times. While it may
+be true, I realized one thing: XS can be scary.
+
+The purpose of this guide is to make XS fun. Yes, fun. Try it out, if you won't
+feel as exhilarated as I do as you make your way up the stairs of XS
+knowledge, I will fully reimburse your tuition.
+
+Ground rules
+------------
+1. We use a template instead of `h2xs`.
+2. We do not bundle an additional C library.
+
+These are the best advices I've received so far and they've proven to be
+crucial.
+
+`h2xs` is old and crufty, and thusfar seems more like a hurdle. This guide will
+instead include a skeleton for each exercise that you could copy and use each
+time you start a new project.
+
+Bundling additional C libraries requires hacks with `ExtUtils::MakeMaker`
+(which is a war in and of itself), including tab character nightmares and
+additional recursive Makefiles. One way around the obvious "you need to have
+this library installed" problem is to provide an `Alien` package. This guide
+might go over it at some point but makes no promises.
+
+Eliminating the use of `h2xs` and bundling any C libraries we use (that
+we haven't wrote by ourselves) remove a lot of needless complexity.
+
+Relevant resources
+------------------
+perlxs.pod (`perldoc perlxs`)
+perlapi.pod (`perldoc perlapi`)
+
+More advanced or specialized resources
+--------------------------------------
+perlhack.pod (`perldoc perlhack`)
+perlhacktips.pod (`perldoc perlhacktips`)
+perlhacktut.pod (`perldoc perlhacktut`)
+perlguts.pod (`perldoc perlguts`)
+perlintern.pod (`perldoc perlintern`)
+perlinterp.pod (`perldoc perlinterp`)
+perlcall.pod (`perldoc perlcall`)
+perlsource.pod (`perldoc perlsource`)
+
