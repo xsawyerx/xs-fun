@@ -19,8 +19,9 @@ F<XSFun.pm>, content as follows:
     use Exporter;
     use XSLoader;
 
-    our $VERSION   = '0.001';
-    our @EXPORT_OK = ();
+    our $VERSION     = '0.001';
+    our @EXPORT_TAGS = ( 'all' => [] );
+    our @EXPORT_OK   = ( @{ $EXPORT_TAGS{'all'} } );
 
     XSLoader::load('XSFun', $VERSION);
 
@@ -85,5 +86,9 @@ layer of F<ppport.h>. After that we can insert any C code we want. Then,
 we give enough XS information to connect this XS file to our Perl code.
 Then we can provide more advanced XS functionality.
 
+From this point on we will use this setup as our skeleton. You can save it
+separately and copy it over in every new chapter.
+
 =head2 Adding some C
+
 
