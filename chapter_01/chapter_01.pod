@@ -27,7 +27,7 @@ We have a I<CODE> section which sets the return value (I<RETVAL>) to the sum
 of I<a> and I<b>. We also have an I<OUTPUT> section that indicates the output
 is the return value (I<RETVAL>).
 
-=head3 Export our functions
+=head2 Export our functions
 
 As soon as we compile our code, the function will be available to the B<XSFun>
 package and be callable as C<XSFun::add_numbers> but we in case we want
@@ -38,7 +38,7 @@ function:
 
     our %EXPORT_TAGS = ( 'all' => ['add_numbers'] );
 
-=head3 Testing
+=head2 Testing
 
 Let's write a small test script that shows off our spectacular code. Create
 a directory F<t> and inside it create the following file F<add_numbers.t>:
