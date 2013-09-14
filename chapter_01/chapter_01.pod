@@ -68,18 +68,18 @@ a directory F<t> and inside it create the following file F<add_numbers.t>:
     use XSFun ':all;
 
     # testing integers
-    cmp_ok( add_numbers( 5,  3 ), '==',  8, '5 + 3 = 8'   );
-    cmp_ok( add_numbers( 31, 1 ), '==', 32, '31 + 1 = 32' );
+    is( add_numbers(  5, 3 ),  8, '5 + 3 = 8'   );
+    is( add_numbers( 31, 1 ), 32, '31 + 1 = 32' );
 
-    cmp_ok( add_numbers_perl( 5,  3 ), '==',  8, '5 + 3 = 8'   );
-    cmp_ok( add_numbers_perl( 31, 1 ), '==', 32, '31 + 1 = 32' );
+    is( add_numbers_perl(  5, 3 ),  8, '5 + 3 = 8'   );
+    is( add_numbers_perl( 31, 1 ), 32, '31 + 1 = 32' );
 
     # testing fractions
-    cmp_ok( add_numbers( 3.1, 4.2 ), '==', 7.3, '3.1 + 4.2 = 7.3' );
-    cmp_ok( add_numbers( 3.2, 4.3 ), '==', 7.5, '3.2 + 4.3 = 7.5' );
+    is( add_numbers( 3.1, 4.2 ), 7.3, '3.1 + 4.2 = 7.3' );
+    is( add_numbers( 3.2, 4.3 ), 7.5, '3.2 + 4.3 = 7.5' );
 
-    cmp_ok( add_numbers_perl( 3.1, 4.2 ), '==', 7.3, '3.1 + 4.2 = 7.3' );
-    cmp_ok( add_numbers_perl( 3.2, 4.3 ), '==', 7.5, '3.2 + 4.3 = 7.5' );
+    is( add_numbers_perl( 3.1, 4.2 ), 7.3, '3.1 + 4.2 = 7.3' );
+    is( add_numbers_perl( 3.2, 4.3 ), 7.5, '3.2 + 4.3 = 7.5' );
 
 Now let's run the tests:
 
@@ -88,4 +88,17 @@ Now let's run the tests:
 You can also run the following command to clean up your directory:
 
     make distclean
+
+I<Why use C<Test::More::is> instead of C<Test::More::cmp_ok>?>
+
+Usually we would use L<Test::More>'s C<cmp_ok()> to test numerical values, but
+in this case we picked C<is()>. The reason is that the result we get back from
+our function has a different absolute value from the one we check for in the
+function, because of how Perl stores floating point values.
+
+We can use C<sprintf()> to show the differences:
+
+    $ perl -e 'printf "%.40f\n", $_ for 3.1+4.2, 7.3'
+    7.3000000000000007105427357601001858711243
+    7.2999999999999998223643160599749535322189
 
