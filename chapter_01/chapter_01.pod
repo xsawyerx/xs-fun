@@ -1,0 +1,68 @@
+=head1 Chapter 01 - Basic XS
+
+=head2 Basic Functions
+
+XS allows us to embed C code directly in the XS file. We don't have to separate
+it to an entire library. This helps us write functions in C that will help us
+speed up our code. If we have a function that needs intensive calculation,
+moving that to C will give us much more speed.
+
+Let's add a function to our XS code.
+
+Open the F<XSFun.xs> file from our skeleton and copy the following after the
+I<XS code> comment:
+
+    double
+    add_numbers(double a, double b)
+        CODE:
+           RETVAL = a + b;
+        OUTPUT:
+           RETVAL
+
+We define a function called C<add_numbers>. It takes two numbers of type
+I<double> and you can see by the definitions that it also returns a I<double>
+type.
+
+We have a I<CODE> section which sets the return value (I<RETVAL>) to the sum
+of I<a> and I<b>. We also have an I<OUTPUT> section that indicates the output
+is the return value (I<RETVAL>).
+
+=head3 Export our functions
+
+As soon as we compile our code, the function will be available to the B<XSFun>
+package and be callable as C<XSFun::add_numbers> but we in case we want
+users to call it as simply C<add_numbers>, we need to export it.
+
+Open F<lib/XSFun.pm> and fix the C<%EXPORT_TAGS> variable to include this new
+function:
+
+    our %EXPORT_TAGS = ( 'all' => ['add_numbers'] );
+
+=head3 Testing
+
+Let's write a small test script that shows off our spectacular code. Create
+a directory F<t> and inside it create the following file F<add_numbers.t>:
+
+    #!perl
+    use strict;
+    use warnings;
+
+    use Test::More tests => 4;
+    use XSFun 'add_numbers';
+
+    # testing integers
+    cmp_ok( add_numbers( 5,  3 ), '==',  8, '5 + 3 = 8'   );
+    cmp_ok( add_numbers( 31, 1 ), '==', 32, '31 + 1 = 32' );
+
+    # testing fractions
+    cmp_ok( add_numbers( 3.1, 4.2 ), '==', 7.3, '3.1 + 4.2 = 7.3' );
+    cmp_ok( add_numbers( 3.2, 4.3 ), '==', 7.5, '3.2 + 4.3 = 7.5' );
+
+Now let's run the test:
+
+    perl Makefile.PL && make && make test
+
+You can also run the following command to clean up your directory:
+
+    make distclean
+
