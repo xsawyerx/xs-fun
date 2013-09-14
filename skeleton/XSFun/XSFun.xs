@@ -7,5 +7,5 @@
 
 MODULE = XSFun		PACKAGE = XSFun		
 
-/* XS code */
+# XS code
 
