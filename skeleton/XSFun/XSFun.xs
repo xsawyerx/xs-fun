@@ -3,9 +3,9 @@
 #include "XSUB.h"
 #include "ppport.h"
 
-/* Your C functions if any go here */
+/* C functions */
 
 MODULE = XSFun		PACKAGE = XSFun		
 
-/* Your XS code goes here */
+/* XS code */
 
