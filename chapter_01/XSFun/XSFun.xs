@@ -16,3 +16,12 @@ add_numbers(double a, double b)
     OUTPUT:
         RETVAL
 
+SV *
+add_numbers_perl(SV *a, SV *b)
+    CODE:
+    {
+        const double sum = SvNV(a) + SvNV(b);
+        RETVAL = newSVnv(sum);
+    }
+    OUTPUT: RETVAL
+

@@ -27,6 +27,23 @@ We have a I<CODE> section which sets the return value (I<RETVAL>) to the sum
 of I<a> and I<b>. We also have an I<OUTPUT> section that indicates the output
 is the return value (I<RETVAL>).
 
+=head2 A Touch of Perl API
+
+Instead of working with pure C types, we can use Perl types. We can write a
+function that receives pointers to two SVs (Scalar Values) and returns an SV
+point to the result. We will create a new SV to represent the value and return
+a point to that.
+
+    SV *
+    add_numbers_perl(SV *a, SV *b)
+        CODE:
+        {
+            const double sum = SvNV(a) + SvNV(b);
+            RETVAL = newSVnv(sum);
+        }
+
+        OUTPUT: RETVAL
+
 =head2 Export our functions
 
 As soon as we compile our code, the function will be available to the B<XSFun>
@@ -36,7 +53,7 @@ users to call it as simply C<add_numbers>, we need to export it.
 Open F<lib/XSFun.pm> and fix the C<%EXPORT_TAGS> variable to include this new
 function:
 
-    our %EXPORT_TAGS = ( 'all' => ['add_numbers'] );
+    our %EXPORT_TAGS = ( 'all' => [qw<add_numbers add_numbers_perl>] );
 
 =head2 Testing
 
@@ -48,17 +65,23 @@ a directory F<t> and inside it create the following file F<add_numbers.t>:
     use warnings;
 
     use Test::More tests => 4;
-    use XSFun 'add_numbers';
+    use XSFun ':all;
 
     # testing integers
     cmp_ok( add_numbers( 5,  3 ), '==',  8, '5 + 3 = 8'   );
     cmp_ok( add_numbers( 31, 1 ), '==', 32, '31 + 1 = 32' );
 
+    cmp_ok( add_numbers_perl( 5,  3 ), '==',  8, '5 + 3 = 8'   );
+    cmp_ok( add_numbers_perl( 31, 1 ), '==', 32, '31 + 1 = 32' );
+
     # testing fractions
     cmp_ok( add_numbers( 3.1, 4.2 ), '==', 7.3, '3.1 + 4.2 = 7.3' );
     cmp_ok( add_numbers( 3.2, 4.3 ), '==', 7.5, '3.2 + 4.3 = 7.5' );
 
-Now let's run the test:
+    cmp_ok( add_numbers_perl( 3.1, 4.2 ), '==', 7.3, '3.1 + 4.2 = 7.3' );
+    cmp_ok( add_numbers_perl( 3.2, 4.3 ), '==', 7.5, '3.2 + 4.3 = 7.5' );
+
+Now let's run the tests:
 
     perl Makefile.PL && make && make test
 
