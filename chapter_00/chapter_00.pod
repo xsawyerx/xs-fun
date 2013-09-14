@@ -1,4 +1,4 @@
-=head1 Chapter 01 - Basic XS
+=head1 Chapter 00 - Preparing the Skeleton
 
 =head2 A Good Start
 
@@ -88,7 +88,4 @@ Then we can provide more advanced XS functionality.
 
 From this point on we will use this setup as our skeleton. You can save it
 separately and copy it over in every new chapter.
-
-=head2 Adding some C
-
 
