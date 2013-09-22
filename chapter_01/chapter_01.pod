@@ -65,7 +65,7 @@ a directory F<t> and inside it create the following file F<add_numbers.t>:
     use warnings;
 
     use Test::More tests => 4;
-    use XSFun ':all;
+    use XSFun ':all';
 
     # testing integers
     is( add_numbers(  5, 3 ),  8, '5 + 3 = 8'   );
