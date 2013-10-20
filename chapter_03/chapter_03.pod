@@ -1,0 +1,210 @@
+=head1 Chapter 03 - Enter Object Oriented
+
+=head2 Introduction
+
+While a functional interface for the C<get_version> function was useful, the
+B<chromaprint> library, as many library do, has context. This means we
+would be better off using an object oriented interface.
+
+We will convert the C<get_version> function into a method and then create a
+C<new> method to generate a new C<bless()>ed hash reference. The second step
+can easily be done with Perl itself (which we will also demonstrate), but
+we're trying to learn us some XS, don't we?
+
+=head2 Preparation
+
+First of all, we create a new skeleton which has the same structure as the
+old but with the new names for files and using a proper namespace.
+
+=head3 Makefile.PL
+
+Create a new F<Makefile.PL> file with the following content:
+
+    use 5.008005;
+    use ExtUtils::MakeMaker;
+    WriteMakefile(
+        NAME           => 'Audio::Chromaprint',
+        VERSION_FROM   => 'lib/Audio/Chromaprint.pm',
+        PREREQ_PM      => { 'Test::More' => 0 },
+        ABSTRACT_FROM  => 'lib/Audio/Chromaprint.pm',
+        AUTHOR         => 'You',
+        LIBS           => ['-lchromaprint'],
+        DEFINE         => '',
+        INC            => '-I.',
+        OBJECT         => '$(O_FILES)',
+    );
+
+=head3 ppport.h
+
+You can generate the F<ppport.h> file using the following command:
+
+    perl -MDevel::PPPort -E'Devel::PPPort::WriteFile'
+
+=head3 Chromaprint.pm
+
+Create a directory structure F<lib/Audio> and inside the file
+F<Chromaprint.pm>:
+
+    package Audio::Chromaprint;
+
+    use strict;
+    use warnings;
+    use XSLoader;
+
+    our $VERSION = '0.001';
+
+    XSLoader::load( 'Audio::Chromaprint', $VERSION );
+
+    1;
+
+    __END__
+
+    =head1 NAME
+
+    Audio::Chromaprint - Interface to the Chromaprint library
+
+You'll notice we removed the exporting, which is unnecessary for Object
+Oriented interfaces, and added a B<NAME> section in the documentation at the
+bottom to provide an abstract to F<Makefile.PL>.
+
+=head3 MANIFEST
+
+The F<MANIFEST> file can be easily created with the command:
+
+    # Perl on GNU/Linux, BSD, Solaris:
+    perl Makefile.PL && make manifest && make distclean
+
+    # Strawberry Perl on Windows:
+    perl Makefile.PL
+    dmake manifest
+    dmake distclean
+
+=head3 Chromaprint.xs
+
+Now we create the F<Chromaprint.xs> file which is associated with the
+correct package loaded by our F<Chromaprint.pm> file:
+
+    #include "EXTERN.h"
+    #include "perl.h"
+    #include "XSUB.h"
+    #include "ppport.h"
+
+    #include <chromaprint.h>
+
+    /* C functions */
+
+    MODULE = Audio::Chromaprint     PACKAGE = Audio::Chromaprint
+
+    # XS code
+
+    PROTOTYPES: ENABLED
+
+We define the module and package as C<Audio::Chromaprint>.
+
+You will notice we also added a definition for B<PROTOTYPES>. This isn't
+necessary, and the default value is C<ENABLED> anyway, but it will remove a
+warning the XS layer adds, so we add it explicitly.
+
+=head2 Convert method: version
+
+Our previous C<get_version> function had one major problem: it assumed that
+we did not have any parameters.
+
+If you are unfamiliar with methods in Perl, it's important to know that when
+you call a method, it will send the object as the first parameter. Assuming we
+were using an Object Oriented interface:
+
+    $object->my_method();
+
+The method C<my_method> is not without parameters at all. It receives the
+object as the first parameter:
+
+    sub my_method {
+        my $self = shift;
+        ...
+    }
+
+As soon as we will try to use our C<get_version> as a method, because it
+assumes there are no parameters, it will fail. The XS layer will generate a
+check for any possible arguments and will croak mentioning the "proper" way
+of calling it (assuming it shouldn't receive parameters at all).
+
+In order to fix this, the only thing we need is to include a parameter in the
+name definition for the function, which will now be a method:
+
+    const char *
+    version(SV *self)
+        CODE:
+            RETVAL = chromaprint_get_version();
+        OUTPUT: RETVAL
+
+This way the XS layer will generate a check that the function is called as
+a method (providing at least one parameter, an SV), instead of being called
+as a function with no parameters.
+
+You will notice we also took the liberty to change the method name to
+C<version>.
+
+=head2 Add method: new
+
+In order to call the C<version> method, we need a blessed hash reference. We
+can easily create one with the following code inside F<Chromaprint.pm>:
+
+    sub new { bless {}, shift }
+
+In a single line, this creates a subroutine called C<new> which blesses an
+empty hash reference into the class name that is sent as a parameter.
+
+However, as we're trying to practice XS, let us do it in XS:
+
+    SV *
+    new( const char *class )
+        CODE:
+            /* Create a hash */
+            HV* hash = newHV();
+
+            /* Create a reference to the hash */
+            SV *const self = newRV_inc( (SV *)hash );
+
+            /* bless into the proper package */
+            RETVAL = sv_bless( self, gv_stashpv( class, 0 ) );
+        OUTPUT: RETVAL
+
+C<newHV> creates a new hash value. It returns a pointer to a hash value
+structure (C<HV>).
+
+Then we want to create a reference to it (C<RV> - Reference Value structure).
+C<newRV_inc> creates a reference from an SV. It expects an SV, so we cast our
+HV as one. We return the data back into a new SV.
+
+Last step is blessing the SV. We use C<gv_stashpv> to fetch a pointer to the
+stash of a specified package. We send it the class name as the package, and
+C<0> as indication of no additional flags to the function. C<sv_bless> is
+called with the hash reference we created with C<newRV_inc> and the pointer
+from C<gv_stashpv>.
+
+The result is simply returned to the Perl side with C<RETVAL>.
+
+=head2 Testing
+
+Let's write a test for our code. We can write the following as F<t/version.t>:
+
+    #!perl
+    use strict;
+    use warnings;
+
+    use Test::More tests => 3;
+    use Audio::Chromaprint;
+
+    my $cp = Audio::Chromaprint->new();
+    isa_ok( $cp, 'Audio::Chromaprint' );
+    can_ok( $cp, 'version'            );
+
+    is( $cp->version, '6.0.0', 'chromaprint version is 6.0.0' );
+
+Try it out:
+
+    perl Makefile.PL && make && make install
+
+(if you're using Strawberry Perl, use C<dmake> instead of C<make>)
+
