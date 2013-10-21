@@ -3,4 +3,5 @@ lib/Audio/Chromaprint.pm
 Makefile.PL
 MANIFEST			This list of files
 ppport.h
+t/leak.t
 t/version.t
