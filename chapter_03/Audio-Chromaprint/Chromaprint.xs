@@ -20,7 +20,7 @@ new( const char *class )
         HV* hash = newHV();
 
         /* Create a reference to the hash */
-        SV *const self = newRV_inc( (SV *)hash );
+        SV *const self = newRV_noinc( (SV *)hash );
 
         /* bless into the proper package */
         RETVAL = sv_bless( self, gv_stashpv( class, 0 ) );

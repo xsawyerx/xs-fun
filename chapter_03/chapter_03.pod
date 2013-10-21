@@ -164,7 +164,7 @@ However, as we're trying to practice XS, let us do it in XS:
             HV* hash = newHV();
 
             /* Create a reference to the hash */
-            SV *const self = newRV_inc( (SV *)hash );
+            SV *const self = newRV_noinc( (SV *)hash );
 
             /* bless into the proper package */
             RETVAL = sv_bless( self, gv_stashpv( class, 0 ) );
@@ -174,8 +174,8 @@ C<newHV> creates a new hash value. It returns a pointer to a hash value
 structure (C<HV>).
 
 Then we want to create a reference to it (C<RV> - Reference Value structure).
-C<newRV_inc> creates a reference from an SV. It expects an SV, so we cast our
-HV as one. We return the data back into a new SV.
+C<newRV_inc> and C<newRV_noinc> create a reference from an SV. It expects an
+SV, so we cast our HV as one. We return the data back into a new SV.
 
 Last step is blessing the SV. We use C<gv_stashpv> to fetch a pointer to the
 stash of a specified package. We send it the class name as the package, and
@@ -207,4 +207,47 @@ Try it out:
     perl Makefile.PL && make && make install
 
 (if you're using Strawberry Perl, use C<dmake> instead of C<make>)
+
+=head2 To increment or not to increment
+
+You might notice both C<newRV_inc> and C<newRV_noinc> were mentioned, but only
+C<newRV_noinc> was used. Why is that?
+
+Perl uses a reference counting memory management system. It keeps a count of
+"living" variables using references. When they go out of scope, or get
+C<undef>ed, their reference count reduces. When it reaches zero, perl (the
+interpreter) knows it can free that variable.
+
+When we create an C<HV>, it has a single reference count. When we create an
+C<RV>, we effectively increase the reference count of it. That's why it is
+called C<newRV_inc>, to indicate it does that. C<newRV_noinc> creates an C<RV>
+without increasing the reference count. Why is this important? Because if we
+go out of scope for the variable, its reference count will be reduced by 1
+(coming from the reference that gets C<undef>ed) but will retain another, from
+the original C<HV> we created.
+
+To understand this better write the following test in F<t/leak.t>:
+
+    #!perl
+    use strict;
+    use warnings;
+    use Test::More tests => 1;
+    use Audio::Chromaprint;
+
+    my $called = 0;
+    package Audio::Chromaprint {
+        sub DESTROY { $called++ }
+    }
+
+    { my $cp = Audio::Chromaprint->new }
+    cmp_ok( $called, '==', 1, 'Destruction successful' );
+
+In this test we add a C<DESTROY> method to the C<Audio::Chromaprint> package
+namespace, which will get called when the object is entirely destroyed. We use
+that method to increment a counter. Then we create an object in an internal
+scope. Once out of the scope, we check that the counter was called once and
+only once.
+
+If you run C<make test>, it will succeed. Try changing in the XS code the
+C<newRV_noinc> to C<newRV_inc>, rebuild and rerun the test. It will fail.
 
