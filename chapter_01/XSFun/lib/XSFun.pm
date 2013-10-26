@@ -15,3 +15,6 @@ XSLoader::load('XSFun', $VERSION);
 
 1;
 
+=head1 NAME
+
+XSFun - Learning XS the fun way
