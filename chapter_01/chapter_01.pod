@@ -20,7 +20,7 @@ I<XS code> comment:
            RETVAL
 
 We define a function called C<add_numbers>. It takes two numbers of type
-I<double> and you can see by the definitions that it also returns a I<double>
+I<double> and as you can see by the definitions that it also returns a I<double>
 type.
 
 We have a I<CODE> section which sets the return value (I<RETVAL>) to the sum
@@ -47,7 +47,7 @@ a point to that.
 =head2 Export our functions
 
 As soon as we compile our code, the function will be available to the B<XSFun>
-package and be callable as C<XSFun::add_numbers> but we in case we want
+package and be callable as C<XSFun::add_numbers> but in case we want
 users to call it as simply C<add_numbers>, we need to export it.
 
 Open F<lib/XSFun.pm> and fix the C<%EXPORT_TAGS> variable to include this new
@@ -65,7 +65,7 @@ a directory F<t> and inside it create the following file F<add_numbers.t>:
     use warnings;
 
     use Test::More tests => 4;
-    use XSFun ':all;
+    use XSFun ':all';
 
     # testing integers
     is( add_numbers(  5, 3 ),  8, '5 + 3 = 8'   );

@@ -3,7 +3,7 @@
 =head2 Compiling against a library
 
 While it's good to be able to speed-up portions of our code using XS, another
-major use of XS is to creating bindings to C and C++ libraries.
+major use of XS is creating bindings to C and C++ libraries.
 
 We will use a relatively simple library to play with called I<Chromaprint>, an
 audio fingerprinting library. You will need to install the development files
