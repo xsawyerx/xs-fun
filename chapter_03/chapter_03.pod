@@ -9,12 +9,12 @@ would be better off using an object oriented interface.
 We will convert the C<get_version> function into a method and then create a
 C<new> method to generate a new C<bless()>ed hash reference. The second step
 can easily be done with Perl itself (which we will also demonstrate), but
-we're trying to learn us some XS, don't we?
+we're trying to learn us some XS, aren't we?
 
 =head2 Preparation
 
 First of all, we create a new skeleton which has the same structure as the
-old but with the new names for files and using a proper namespace.
+old one but with the new names for files and using a proper namespace.
 
 =head3 Makefile.PL
 

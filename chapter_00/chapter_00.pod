@@ -29,7 +29,11 @@ F<XSFun.pm>, content as follows:
 
     1;
 
-L<XSLoader> is loads C libraries dynamically so they can be used in Perl.
+    =head1 NAME
+
+    XSFun - Learning XS the fun way
+
+L<XSLoader> loads C libraries dynamically so they can be used in Perl.
 
 As soon as you C<use XSFun>, it will load our XS code using L<XSLoader> and
 make it available and known to Perl.
