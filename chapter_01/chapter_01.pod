@@ -20,7 +20,7 @@ I<XS code> comment:
            RETVAL
 
 We define a function called C<add_numbers>. It takes two numbers of type
-I<double> and as you can see by the definitions that it also returns a I<double>
+I<double> and as you can see by the definition, it also returns a I<double>
 type.
 
 We have a I<CODE> section which sets the return value (I<RETVAL>) to the sum
