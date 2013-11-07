@@ -64,7 +64,7 @@ a directory F<t> and inside it create the following file F<add_numbers.t>:
     use strict;
     use warnings;
 
-    use Test::More tests => 4;
+    use Test::More tests => 8;
     use XSFun ':all';
 
     # testing integers
