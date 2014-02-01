@@ -84,6 +84,7 @@ The F<MANIFEST> file can be easily created with the command:
 Now we create the F<Chromaprint.xs> file which is associated with the
 correct package loaded by our F<Chromaprint.pm> file:
 
+    #define PERL_NO_GET_CONTEXT
     #include "EXTERN.h"
     #include "perl.h"
     #include "XSUB.h"
