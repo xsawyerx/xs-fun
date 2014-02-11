@@ -180,7 +180,7 @@ SV, so we cast our HV as one. We return the data back into a new SV.
 Last step is blessing the SV. We use C<gv_stashpv> to fetch a pointer to the
 stash of a specified package. We send it the class name as the package, and
 C<0> as indication of no additional flags to the function. C<sv_bless> is
-called with the hash reference we created with C<newRV_inc> and the pointer
+called with the hash reference we created with C<newRV_noinc> and the pointer
 from C<gv_stashpv>.
 
 The result is simply returned to the Perl side with C<RETVAL>.
