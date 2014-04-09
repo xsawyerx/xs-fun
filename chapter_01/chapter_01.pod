@@ -46,9 +46,9 @@ return a pointer to that.
 
 =head2 Export our functions
 
-As soon as we compile our code, the function will be available to the B<XSFun>
-package and be callable as C<XSFun::add_numbers> but in case we want
-users to call it as simply C<add_numbers>, we need to export it.
+As soon as we compile our code, the function will be available to the
+B<XSFun> package and be callable as C<XSFun::add_numbers>.  However, in case
+we want users to call it as simply C<add_numbers>, we need to export it.
 
 Open F<lib/XSFun.pm> and fix the C<%EXPORT_TAGS> variable to include this new
 function:
