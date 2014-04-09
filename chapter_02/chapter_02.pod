@@ -5,7 +5,7 @@
 While it's good to be able to speed-up portions of our code using XS, another
 major use of XS is to create bindings to C and C++ libraries.
 
-We will use a relatively simple library to play with called I<Chromaprint>, an
+We will play with a relatively simple library called I<Chromaprint>, an
 audio fingerprinting library. You will need to install the development files
 for it, the headers and sources.
 
