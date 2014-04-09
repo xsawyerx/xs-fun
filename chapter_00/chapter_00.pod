@@ -40,8 +40,8 @@ make it available and known to Perl.
 
 =head3 Makefile.PL
 
-In the top-level we create the F<Makefile.PL> which will generate a proper
-F<Makefile>, content as follows:
+In the top-level directory create the F<Makefile.PL> which will generate a
+proper F<Makefile>, content as follows:
 
     use 5.008005;
     use ExtUtils::MakeMaker;
