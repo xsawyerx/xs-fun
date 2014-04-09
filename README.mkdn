@@ -10,16 +10,17 @@ knowledge, I will fully reimburse your tuition.
 
 Ground rules
 ------------
+
 1. We use a template instead of `h2xs`.
 2. We do not bundle an additional C library.
 3. We assume you have at least Perl 5.14.2.
 
-These are the best advices I've received so far and they've proven to be
-crucial.
+These are the best bits of advice I've received so far and they've proven
+to be crucial.
 
-`h2xs` is old and crufty, and thusfar seems more like a hurdle. This guide will
-instead include a skeleton for each exercise that you could copy and use each
-time you start a new project.
+`h2xs` is old and crufty, and thusfar seems more like a hurdle. Instead,
+this guide includes a skeleton for each exercise that you can copy and use
+each time you start a new project.
 
 Bundling additional C libraries requires hacks with `ExtUtils::MakeMaker`
 (which is a war in and of itself), including tab character nightmares and
