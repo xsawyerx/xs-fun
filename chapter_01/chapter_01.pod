@@ -31,8 +31,8 @@ is the return value (I<RETVAL>).
 
 Instead of working with pure C types, we can use Perl types. We can write a
 function that receives pointers to two SVs (Scalar Values) and returns an SV
-point to the result. We will create a new SV to represent the value and return
-a point to that.
+pointer to the result. We will create a new SV to represent the value and
+return a pointer to that.
 
     SV *
     add_numbers_perl(SV *a, SV *b)
