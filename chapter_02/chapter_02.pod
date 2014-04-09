@@ -34,6 +34,8 @@ following XS code to C<XSFun.xs>:
 
 Let's add a test for it. Create a file F<version.t> with the following:
 
+    #!perl
+
     use strict;
     use warnings;
 
