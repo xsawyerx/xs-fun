@@ -22,7 +22,7 @@ This will compile our code with I<Chromaprint>.
 =head2 The Smallest Function
 
 Let's start with a simple function that fetches the library version. Add the
-following XS code:
+following XS code to C<XSFun.xs>:
 
     #include <chromaprint.h>
 
