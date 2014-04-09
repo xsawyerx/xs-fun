@@ -3,7 +3,7 @@
 =head2 Introduction
 
 While a functional interface for the C<get_version> function was useful, the
-B<chromaprint> library, as many library do, has context. This means we
+B<chromaprint> library, as many libraries do, has context. This means we
 would be better off using an object oriented interface.
 
 We will convert the C<get_version> function into a method and then create a
