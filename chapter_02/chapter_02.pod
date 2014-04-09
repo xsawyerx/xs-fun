@@ -27,7 +27,7 @@ following XS code to C<XSFun.xs>:
     #include <chromaprint.h>
 
     const char *
-    get_version
+    get_version()
         CODE:
             RETVAL = chromaprint_get_version();
         OUTPUT: RETVAL
