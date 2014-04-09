@@ -204,7 +204,7 @@ Let's write a test for our code. We can write the following as F<t/version.t>:
 
 Try it out:
 
-    perl Makefile.PL && make && make install
+    perl Makefile.PL && make && make test
 
 (if you're using Strawberry Perl, use C<dmake> instead of C<make>)
 
