@@ -3,9 +3,9 @@
 =head2 Compiling against a library
 
 While it's good to be able to speed-up portions of our code using XS, another
-major use of XS is creating bindings to C and C++ libraries.
+major use of XS is to create bindings to C and C++ libraries.
 
-We will use a relatively simple library to play with called I<Chromaprint>, an
+We will play with a relatively simple library called I<Chromaprint>, an
 audio fingerprinting library. You will need to install the development files
 for it, the headers and sources.
 
@@ -22,17 +22,19 @@ This will compile our code with I<Chromaprint>.
 =head2 The Smallest Function
 
 Let's start with a simple function that fetches the library version. Add the
-following XS code:
+following XS code to C<XSFun.xs>:
 
     #include <chromaprint.h>
 
     const char *
-    get_version
+    get_version()
         CODE:
             RETVAL = chromaprint_get_version();
         OUTPUT: RETVAL
 
 Let's add a test for it. Create a file F<version.t> with the following:
+
+    #!perl
 
     use strict;
     use warnings;
@@ -42,7 +44,11 @@ Let's add a test for it. Create a file F<version.t> with the following:
 
     is( get_version(), '6.0.0', 'chromaprint version is 6.0.0' );
 
-Try to compile and run the code:
+Remember to export the function in C<lib/XSFun.pm>:
+
+    our %EXPORT_TAGS = ( 'all' => [qw<get_version>] );
+
+Now try to compile and run the code:
 
     perl Makefile.PL && make && make test
 
