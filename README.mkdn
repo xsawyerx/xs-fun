@@ -11,7 +11,7 @@ knowledge, I will fully reimburse your tuition.
 Ground rules
 ------------
 
-1. We use a template instead of `h2xs`.
+1. We use a template instead of [`h2xs`](http://perldoc.perl.org/h2xs.html).
 2. We do not bundle an additional C library.
 3. We assume you have at least Perl 5.14.2.
 
@@ -37,18 +37,18 @@ this point it is not yet necessarily important.
 Relevant resources
 ------------------
 
-* perlxs.pod (`perldoc perlxs`)
-* perlapi.pod (`perldoc perlapi`)
+* [perlxs](http://perldoc.perl.org/perlxs.html) (`perldoc perlxs`)
+* [perlapi](http://perldoc.perl.org/perlapi.html) (`perldoc perlapi`)
 
 More advanced or specialized resources
 --------------------------------------
 
-* perlhack.pod (`perldoc perlhack`)
-* perlhacktips.pod (`perldoc perlhacktips`)
-* perlhacktut.pod (`perldoc perlhacktut`)
-* perlguts.pod (`perldoc perlguts`)
-* perlintern.pod (`perldoc perlintern`)
-* perlinterp.pod (`perldoc perlinterp`)
-* perlcall.pod (`perldoc perlcall`)
-* perlsource.pod (`perldoc perlsource`)
+* [perlhack](http://perldoc.perl.org/perlhack.html) (`perldoc perlhack`)
+* [perlhacktips](http://perldoc.perl.org/perlhacktips.html) (`perldoc perlhacktips`)
+* [perlhacktut](http://perldoc.perl.org/perlhacktut.html) (`perldoc perlhacktut`)
+* [perlguts](http://perldoc.perl.org/perlguts.html) (`perldoc perlguts`)
+* [perlintern](http://perldoc.perl.org/perlintern.html) (`perldoc perlintern`)
+* [perlinterp](http://perldoc.perl.org/perlinterp.html) (`perldoc perlinterp`)
+* [perlcall](http://perldoc.perl.org/perlcall.html) (`perldoc perlcall`)
+* [perlsource](http://perldoc/perl.org/perlsource.html) (`perldoc perlsource`)
 
