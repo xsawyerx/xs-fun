@@ -43,6 +43,7 @@ Relevant resources
 More advanced or specialized resources
 --------------------------------------
 
+* [General index](http://perldoc.perl.org/index-internals.html)
 * [perlhack](http://perldoc.perl.org/perlhack.html) (`perldoc perlhack`)
 * [perlhacktips](http://perldoc.perl.org/perlhacktips.html) (`perldoc perlhacktips`)
 * [perlhacktut](http://perldoc.perl.org/perlhacktut.html) (`perldoc perlhacktut`)
