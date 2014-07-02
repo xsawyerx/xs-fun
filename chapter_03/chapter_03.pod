@@ -105,7 +105,7 @@ You will notice we also added a definition for B<PROTOTYPES>. This isn't
 necessary, and the default value is C<ENABLED> anyway, but it will remove a
 warning the XS layer adds, so we add it explicitly.
 
-=head2 Convert method: version
+=head2 Convert to method: version
 
 Our previous C<get_version> function had one major problem: it assumed that
 we did not have any parameters.
@@ -145,9 +145,39 @@ as a function with no parameters.
 You will notice we also took the liberty to change the method name to
 C<version>.
 
+=head2 A C<version> method as in Perl
+
+The above C<version> method will be a Perl sub that B<requires exactly one parameter>.
+That means in Perl, it can be called in two ways:
+
+    $obj->version()
+    version($obj)
+
+So the XSUB behaves equally indiscriminate as any other sub would do in
+Perl. The only difference is that if the method was implemented in Perl,
+it wouldn't use it's object parameter at all, so
+
+    version() # look ma, no arguments
+
+would also be legal. The XSUB will C<croak> on that. In this case
+that is probably a good thing. But if you wanted it to behave even more
+like an actual Perl function that could be called without arguments,
+the XS code would look like this instead:
+
+    const char *
+    version(...)
+        CODE:
+            RETVAL = chromaprint_get_version();
+        OUTPUT: RETVAL
+
+See what we did there? We dropped the explicit parameter C<self> and
+replaced it with C<...>, which basically says "any number of parameters
+are okay". We'll cover later how to actually use parameters passed to
+such a variadic XSUB.
+
 =head2 Add method: new
 
-In order to call the C<version> method, we need a blessed hash reference. We
+In order to call C<version> as a method, we need a blessed hash reference. We
 can easily create one with the following code inside F<Chromaprint.pm>:
 
     sub new { bless {}, shift }
