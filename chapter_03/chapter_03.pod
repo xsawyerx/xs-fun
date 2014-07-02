@@ -91,11 +91,11 @@ correct package loaded by our F<Chromaprint.pm> file:
 
     #include <chromaprint.h>
 
-    /* C functions */
+    /* Custom C functions can go here */
 
     MODULE = Audio::Chromaprint     PACKAGE = Audio::Chromaprint
 
-    # XS code
+    # XS code goes here
 
     PROTOTYPES: ENABLED
 
