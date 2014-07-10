@@ -252,26 +252,30 @@ Perl uses a reference counting memory management system. When a new value
 is created, its reference count is set to be 1. No matter whether it came
 into life as a variable in Perl code, as a temporary deep inside
 the bowels of the runtime, or explicitly using C<newRV*> or its siblings
-in your XS code. Perl keeps a count of
-"live" values (technically, the most generic form of a Perl value is an C<SV>)
-using this count of things that refer to it.
+in your XS code.
+
+Perl keeps a count of "live" values (technically, the most generic form of a
+Perl value is an C<SV>) using this count of things that refer to it.
+
 When they go out of scope, or get explicitly C<undef>ed, their reference count
 is decremented. When it reaches zero, perl (the interpreter) knows
 it can free that value and will generally do so immediately.
 
 When we create an C<HV>, it has a single reference count. Our code effectively
-"owns" that value. When we create an
-C<RV> that points at the C<HV>, the C<RV> should now own its on reference count
-to the C<HV>. We can now use C<newRV_inc> to create the C<RV>. That I<inc>rements the hash's
+"owns" that value. When we create an C<RV> that points at the C<HV>,
+the C<RV> should now own its on reference count to the C<HV>.
+
+We can now use C<newRV_inc> to create the C<RV>. That I<inc>rements the hash's
 reference count to 2, and both the C<RV> and our code own one reference to it.
 
-C<newRV_noinc> creates an C<RV>
-without increasing the reference count. Generally, this means that the C<RV>
-is taking ownership of one of the existing references. Why is this important?
-We don't plan to hold on to that C<HV> in our code. The C<RV> will fully own
-it and we will return the reference, the C<RV> from the XSUB. If that C<RV>
-is freed, it will give up its reference (count) to the C<HV> and perl will
-free the C<HV> correctly.
+C<newRV_noinc> creates an C<RV> without increasing the reference count.
+Generally, this means that the C<RV> is taking ownership of one of the
+existing references.
+
+Why is this important? We don't plan to hold on to that C<HV> in our code.
+The C<RV> will fully own it and we will return the reference, the C<RV> from
+the XSUB. If that C<RV> is freed, it will give up its reference (count) to
+the C<HV> and perl will free the C<HV> correctly.
 
 To understand this better write the following test in F<t/leak.t>:
 
