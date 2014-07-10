@@ -2,10 +2,9 @@ package XSFun;
 
 use strict;
 use warnings;
-use Exporter;
 use XSLoader;
 
-use base 'Exporter';
+use Exporter 5.57 'import';
 
 our $VERSION     = '0.001';
 our %EXPORT_TAGS = ( 'all' => [qw<add_numbers add_numbers_perl>] );

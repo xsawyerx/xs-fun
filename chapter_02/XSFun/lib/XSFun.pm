@@ -2,10 +2,8 @@ package XSFun;
 
 use strict;
 use warnings;
-use Exporter;
+use Exporter 5.57 'import';
 use XSLoader;
-
-use base 'Exporter';
 
 our $VERSION     = '0.001';
 our %EXPORT_TAGS = ( 'all' => [qw<get_version>] );
