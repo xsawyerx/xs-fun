@@ -78,6 +78,7 @@ XS code in order to glue together an existing library and Perl.
 
 Create the file F<XSFun.xs> with the following content:
 
+    #define PERL_NO_GET_CONTEXT
     #include "EXTERN.h"
     #include "perl.h"
     #include "XSUB.h"
@@ -89,7 +90,15 @@ Create the file F<XSFun.xs> with the following content:
 
     # XS code
 
-The first three lines are XS lines. The next line uses the portability
+The first line defines that perl (the compiler) should not fetch the
+context for every request. This will make the code more efficient at the
+cost of being aware of MULTIPLICITY. While this is a somewhat vague
+description, it should generally be regarded as, I<unless I'm writing
+threaded, this will make my XS code faster without any additional work
+from me>, which is good enough for us to add it. It's considered a modern
+XS practice.
+
+The next three lines are XS headers. The last include line uses the portability
 layer of F<ppport.h>. After that we can insert any C code we want. Then,
 we give enough XS information to connect this XS file to our Perl code.
 Afterwards we can provide more advanced XS functionality.
