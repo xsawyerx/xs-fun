@@ -72,7 +72,7 @@ Here is the output:
     #   Failed test 'Constructor set correct default algorithm'
     #   at t/new.t line 13.
     #          got: undef
-    #     expected: 'Test2'
+    #     expected: 'test2'
     # Looks like you failed 1 test of 2.
     Dubious, test returned 1 (wstat 256, 0x100)
     Failed 1/2 subtests
@@ -182,8 +182,8 @@ variables.
 
     #   Failed test 'Constructor set correct algorithm from argument'
     #   at t/new.t line 25.
-    #          got: 'Test2'
-    #     expected: 'Test3'
+    #          got: 'test2'
+    #     expected: 'test3'
     # Looks like you failed 1 test of 4.
     Dubious, test returned 1 (wstat 256, 0x100)
     Failed 1/4 subtests
@@ -257,8 +257,8 @@ Trying it out...
 
     #   Failed test 'Constructor set correct algorithm from argument'
     #   at t/new.t line 51.
-    #          got: 'Test2'
-    #     expected: 'Test3'
+    #          got: 'test2'
+    #     expected: 'test3'
     # Looks like you failed 1 test of 8.
     Dubious, test returned 1 (wstat 256, 0x100)
     Failed 1/8 subtests
@@ -294,7 +294,7 @@ This, however, will cause a problem, which we will see.
             hash,                                /* created before */
             "algorithm",                         /* key */
             strlen("algorithm"),                 /* length */
-            newSVpv( "Test2", strlen("Test2") ), /* new SV with PV */
+            newSVpv( "test2", strlen("test2") ), /* new SV with PV */
             0                                    /* let Perl calculate */
         );
 
@@ -367,7 +367,7 @@ work, will bite us at some point without us even realizing it.
 
 If you add the following to the test code:
 
-    $cp->{'algorithm'} = 'Test1';
+    $cp->{'algorithm'} = 'test1';
 
 You will get the following output:
 
@@ -410,7 +410,7 @@ we will get the following output:
     SV = PV(0x267ba70) at 0x26b3b00
       REFCNT = 1
       FLAGS = (PADTMP,POK,READONLY,pPOK)
-      PV = 0x26bfaa0 "Test3"\0
+      PV = 0x26bfaa0 "test3"\0
       CUR = 5
       LEN = 16
 
