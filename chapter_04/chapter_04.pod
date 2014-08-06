@@ -1,0 +1,576 @@
+=head1 Chapter 04 - Better Construction
+
+=head2 What's in a constructor?
+
+Most constructors don't just create objects. Blessing a reference is cool,
+but usually we need more than that. If we want to improve our constructor,
+we would need to make it update the attributes we keep in the hash.
+
+Of course, one more important feature is being able to provide attribute
+subroutines. They will allow us to fetch the attribute from the hash and
+to set a new value - what's called I<full affordance accessors>.
+
+This chapter will start with creating a default value for an attribute
+(or, rather, a key in our C<$self> hash), and will then focus on improving
+the accessor by letting it set the attribute value by user arguments.
+
+Since this covers quite a lot of ground, we will leave the accessors to
+a future chapter.
+
+Let's dig in!
+
+=head2 First, the tests
+
+To make sure we don't screw up, we will write some tests. They will cover
+checking our constructor.
+
+Reading the documentation for B<Chromaprint>, we see that there's an attribute
+defining the algorithm to be used. It has a default, B<test2> (or the actual
+constant name, B<CHROMAPRINT_ALGORITHM_TEST2>). Let's test that we're setting
+it properly.
+
+=head3 new.t
+
+Beginning with F<t/new.t>, we can write the following simple test:
+
+    #!perl
+
+    use strict;
+    use warnings;
+    use Test::More tests => 2;
+    use Audio::Chromaprint;
+
+    my $cp = Audio::Chromaprint->new();
+
+    isa_ok( $cp, 'Audio::Chromaprint' );
+    is(
+        $cp->{'algorithm'},
+        'test2',
+        'Constructor set correct default algorithm',
+    );
+
+=head3 Running
+
+When running the test, we can ask the testing harness to only run the new
+test file we wrote and nothing else.
+
+Assuming we have the default template with nothing in it, running the test
+will work as such:
+
+    $ perl Makefile.PL
+    $ make && make test TEST_VERBOSE=1 TEST_FILES="t/new.t"
+
+Once we ran the F<Makefile.PL>, we have a given F<Makefile> file, and it
+allows us to repeat the C<make && make test> line as many times as we want.
+
+Here is the output:
+
+    1..2
+    ok 1 - The object isa Audio::Chromaprint
+    not ok 2 - Constructor set correct default algorithm
+
+    #   Failed test 'Constructor set correct default algorithm'
+    #   at t/new.t line 13.
+    #          got: undef
+    #     expected: 'Test2'
+    # Looks like you failed 1 test of 2.
+    Dubious, test returned 1 (wstat 256, 0x100)
+    Failed 1/2 subtests
+
+As you can see, we failed the second test because we did not provide a
+value. Let's fix it.
+
+=head2 Adding a default value
+
+To add a default value, we would need to add data to the hash. This means
+creating a new value (B<test2>) and setting it in a key in the hash
+we created.
+
+We can use C<hv_store> (which can be found it L<perlapi>) in order to store
+a new value in the hash we created in the previous chapter. Let's add it:
+
+    SV *
+    new( const char *class, ... )
+        CODE:
+            HV *hash = newHV();
+
+            /* using sv_store we need to provide the following:
+               * hash in which to store
+               * the key
+               * key length
+               * SV with the value
+               * pre-calculated hash or 0
+            */
+
+            hv_store(
+                hash,                                /* created before */
+                "algorithm",                         /* key */
+                strlen("algorithm"),                 /* length */
+                newSVpv( "test2", strlen("test2") ), /* new SV with PV */
+                0                                    /* let Perl calculate */
+            );
+
+            SV* const self = newRV_noinc( (SV *)hash );
+    
+            RETVAL = sv_bless( self, gv_stashpv( class, 0 ) );
+        OUTPUT: RETVAL
+
+=head2 Ru-run tests
+
+    $ make && make test TEST_VERBOSE=1 TEST_FILES="t/new.t"
+
+    1..2
+    ok 1 - The object isa Audio::Chromaprint
+    ok 2 - Constructor set correct default algorithm
+    ok
+    All tests successful.
+
+It works!
+
+=head2 Smarter constructor
+
+Now that we have a default, we would like the user to be able to set it
+to anything it wants.
+
+=head3 Improving our test
+
+Let's write a test to reflect what we want to happen. We'll start with
+what we have and add another chunk that changes the value using the
+constructor. We put each chunk its own scope so we don't override the
+variables.
+
+    #!perl
+
+    use strict;
+    use warnings;
+    use Test::More tests => 4;
+    use Audio::Chromaprint;
+
+    {
+        my $cp = Audio::Chromaprint->new();
+
+        isa_ok( $cp, 'Audio::Chromaprint' );
+        is(
+            $cp->{'algorithm'},
+            'test2',
+            'Constructor set correct default algorithm',
+        );
+    }
+
+    {
+        my $cp = Audio::Chromaprint->new(
+            algorithm => 'test3'
+        );
+
+        isa_ok( $cp, 'Audio::Chromaprint' );
+        is(
+            $cp->{'algorithm'},
+            'test3',
+            'Constructor set correct algorithm from argument',
+        );
+    }
+
+=head3 Running it
+
+    $ make && make test TEST_VERBOSE=1 TEST_FILES="t/new.t"
+
+    1..4
+    ok 1 - The object isa Audio::Chromaprint
+    ok 2 - Constructor set correct default algorithm
+    ok 3 - The object isa Audio::Chromaprint
+    not ok 4 - Constructor set correct algorithm from argument
+
+    #   Failed test 'Constructor set correct algorithm from argument'
+    #   at t/new.t line 25.
+    #          got: 'Test2'
+    #     expected: 'Test3'
+    # Looks like you failed 1 test of 4.
+    Dubious, test returned 1 (wstat 256, 0x100)
+    Failed 1/4 subtests
+
+We are now failing because we're not setting the attribute value using the
+argument provided by our test. We need to fix it.
+
+=head3 Checking input better
+
+If we want to handle key/value pairs as input to the constructor, we need
+to have a better check of the input. What if we expect a pair and the user
+sends in a hash reference? What if it's an array reference? Let's be more
+explicit in what we allow before we try to analyze it.
+
+We will add the following piece of code after the B<CODE> segment in our
+XSUB:
+
+    CODE:
+        /* check the number of input arguments */
+        /* "items" represents the argument count */
+        if ( ( items - 1 ) % 2 )
+            croak("Expecting a hash as input to constructor\n");
+
+        // ... rest of code ...
+
+Should we test it? Yes, we should!
+
+=head3 Testing the limits
+
+We can simply add this following block to the F<t/new.t> test file:
+
+    use Test::Fatal;
+
+    {
+        like(
+            exception { Audio::Chromaprint->new('SingleInput') },
+            qr/^Expecting a hash as input to constructor/,
+            'Incorrect input for single item (instead of pairs)',
+        );
+
+        like(
+            exception { Audio::Chromaprint->new( 1, 2, 3 ) },
+            qr/^Expecting a hash as input to constructor/,
+            'Incorrect input for odd items (instead of pairs(',
+        );
+
+        is(
+            exception { Audio::Chromaprint->new() },
+            undef,
+            'Successful at calling a constructor without arguments',
+        );
+
+        is(
+            exception { Audio::Chromaprint->new( key => 'value' ) },
+            undef,
+            'Successful at calling a constructor with even items',
+        );
+    }
+
+Trying it out...
+
+    1..8
+    ok 1 - Incorrect input for single item (instead of pairs)
+    ok 2 - Incorrect input for odd items (instead of pairs(
+    ok 3 - Successful at calling a constructor without arguments
+    ok 4 - Successful at calling a constructor with even items
+    ok 5 - The object isa Audio::Chromaprint
+    ok 6 - Constructor set correct default algorithm
+    ok 7 - The object isa Audio::Chromaprint
+    not ok 8 - Constructor set correct algorithm from argument
+
+    #   Failed test 'Constructor set correct algorithm from argument'
+    #   at t/new.t line 51.
+    #          got: 'Test2'
+    #     expected: 'Test3'
+    # Looks like you failed 1 test of 8.
+    Dubious, test returned 1 (wstat 256, 0x100)
+    Failed 1/8 subtests
+
+Alright. It all passes, except for actually setting the value according to
+the input from the user.
+
+=head3 Looping over the Perl stack
+
+The Perl interpreter puts all the variables from the Perl side on a stack.
+The stack has pointers to SVs that represent what the user sent to the XSUB.
+Pretty simple. It's actually that simple to play with it too.
+
+Right after our code that goes over the items, we can loop over the stack
+(available using the C<ST> macro) and use the information there to add
+variables to the hash we created.
+
+Let's take a look at a simple example that will use C<hv_store_ent> (which
+can also find in L<perlapi>). We used the C<hv_store> function in the default
+because we had strings for the key and value. However, in this case, because
+we get SVs from the stack, we can use C<hv_store_ent>, which allows us to
+store using SVs for key and value.
+
+This, however, will cause a problem, which we will see.
+
+    CODE:
+        if ( ( items - 1 ) % 2 )
+            croak("Expecting a hash as input to constructor\n");
+
+        HV *hash = newHV();
+
+        hv_store(
+            hash,                                /* created before */
+            "algorithm",                         /* key */
+            strlen("algorithm"),                 /* length */
+            newSVpv( "Test2", strlen("Test2") ), /* new SV with PV */
+            0                                    /* let Perl calculate */
+        );
+
+        int i;
+        for ( i = 1; i < items; i += 2 ) {
+            /* get two items from the stack  */
+            /* it starts from 1 in this case */
+            SV *key   = ST(i);
+            SV *value = ST( i + 1 ); 
+
+            /* store the value by key in the hash */
+            hv_store_ent( hash, key, value, 0 );
+        }
+
+        /* ... rest of code ... */
+
+=head3 Trying it out
+
+If we actually run this code, we will get this warning in our output:
+
+    Attempt to free unreferenced scalar: SV 0x26f9ac0, Perl interpreter:
+    0x24c5010.
+
+The reason is simple, but the explanation is a bit tricky to follow.[1]
+
+When we pick the SV from the stack, it has no actual references to it. Okay,
+I'm lying. It has one, which is the one from the op code, but that will just
+confuse you - better to think of it as I<no one is holding on to this>.
+
+This is why Perl actually releases it before it even exits the scope in which
+it's running in the test. When it exits the scope, it tries to release it yet
+again, but it fails, because it has already been released, hence the warning.
+
+If we read the documentation of C<hv_store_ent> in C<perlapi>, it has the
+following sentence: I<Note that the caller is responsible for suitably
+incrementing the reference count of "val" before the call>.
+
+So we can simply increment the reference count for the SV.
+
+    /* get two items from the stack  */
+    /* it starts from 1 in this case */
+    SV *key   = ST(i);
+    SV *value = ST( i + 1 );
+
+    /* increment */
+    SvREFCNT_inc(value);
+
+Running the tests:
+
+    t/new.t ..
+    1..8
+    ok 1 - Incorrect input for single item (instead of pairs)
+    ok 2 - Incorrect input for odd items (instead of pairs(
+    ok 3 - Successful at calling a constructor without arguments
+    ok 4 - Successful at calling a constructor with even items
+    ok 5 - The object isa Audio::Chromaprint
+    ok 6 - Constructor set correct default algorithm
+    ok 7 - The object isa Audio::Chromaprint
+    ok 8 - Constructor set correct algorithm from argument
+    ok
+    All tests successful.
+
+I<[1] If you find this confusing, please help me correct it!>
+
+
+=head2 More problems
+
+There is a side-effect we get here that, unless we understand how things
+work, will bite us at some point without us even realizing it.
+
+If you add the following to the test code:
+
+    $cp->{'algorithm'} = 'Test1';
+
+You will get the following output:
+
+    ...
+    ok 8 - Constructor set correct algorithm from argument
+    Modification of a read-only value attempted at t/new.t line 57.
+    # Looks like your test exited with 2 just after 8.
+    Dubious, test returned 2 (wstat 512, 0x200)
+
+Wait, what?
+
+=head3 What's going on?
+
+When you store a value using either C<hv_store> or C<hv_store_ent>, what Perl
+actually does is fetch the value SV for that key and change its PV with a PV
+of the new string you wanted to assign. It's actually much faster than
+creating a new SV.
+
+So if the SV is read-only, this won't work. So how do we fix it? Well, we can
+do various different things:
+
+=over 4
+
+=item * Send a variable instead of string
+
+Current we use the C<new> method as such:
+
+    my $cp = Algorithm::Chromaprint->new( algorithm => 'test3' );
+
+B<test3> here is a static string. It's not a variable. This is why, if we
+dump the variable using C<sv_dump> in the XS, as such:
+
+    SV *value = ST( i + 1 );
+
+    /* dump value */
+    sv_dump(value);
+
+we will get the following output:
+
+    SV = PV(0x267ba70) at 0x26b3b00
+      REFCNT = 1
+      FLAGS = (PADTMP,POK,READONLY,pPOK)
+      PV = 0x26bfaa0 "Test3"\0
+      CUR = 5
+      LEN = 16
+
+(This is the same output you will get with L<Devel::Peek>.)
+
+You can see the B<FLAGS> entry has B<PADTMP> and B<READONLY>. This is
+because it's a temporary lexical variable and read-only.
+
+We can just send a variable instead:
+
+    my $algo = 'test3';
+    my $cp   = Audio::Chromaprint->new( algorithm => $algo );
+
+But... do we really want to do it this way? No. We don't. Besides, we want to
+make sure the SV has the right reference count. We're responsible for it.
+
+=item * Remove the READONLY flag
+
+The next chapter will side-track to cover the B<READONLY> flag and will help
+understand this better. Suffice to say that, while it's possible to simply
+disable the B<READONLY> restriction and then change the value anyway, this
+will cause a massive action-at-a-distance behavior in the future, and we
+(and everyone we care about) will hate us forever for this.
+
+We do B<NOT> want to do this.
+
+=item * Create a new SV with the value
+
+The best way to handle it is to create a new SV using the SV we got from
+the stack. While the SV from the stack will get freed automatically by Perl,
+we will provide our own independent SV, which will not be read-only, and
+which could easily be added to the hash.
+
+=back
+
+=head3 Creating a new SV
+
+To create a new SV, we use C<newSVsv>, which creates a new SV from an
+existing SV. This means that whether the user provided a value which is a
+string (PV), an integer (IV), or a double (NV), we will have it in the new
+SV.
+
+    SV *key   = ST(i);
+    SV *value = newSVsv( ST( i + 1 ) );
+
+The call to C<SvREFCNT_inc> is no longer necessary.
+
+=head2 Finishing
+
+=head3 Chromaprint.xs
+
+    #define PERL_NO_GET_CONTEXT
+    #include "EXTERN.h"
+    #include "perl.h"
+    #include "XSUB.h"
+    #include "ppport.h"
+
+    #include <chromaprint.h>
+
+    MODULE = Audio::Chromaprint             PACKAGE = Audio::Chromaprint
+
+    PROTOTYPES: ENABLED
+
+    SV *
+    new( const char *class, ... )
+        CODE:
+            if ( ( items - 1 ) % 2 )
+                croak("Expecting a hash as input to constructor");
+
+            HV *hash = newHV();
+
+            hv_store(
+                hash,
+                "algorithm",
+                strlen("algorithm"),
+                newSVpv( "test2", strlen("test2") ),
+                0
+            );
+
+            int i;
+            for ( i = 1; i < items; i += 2 ) {
+                SV *key   = ST(i);
+                SV *value = newSVsv( ST( i + 1 ) );
+
+                hv_store_ent( hash, key, value, 0 );
+            }
+
+            SV* const self = newRV_noinc( (SV *)hash );
+
+            RETVAL = sv_bless( self, gv_stashpv( class, 0 ) );
+        OUTPUT: RETVAL
+
+=head3 new.t
+
+    #!perl
+
+    use strict;
+    use warnings;
+    use Test::More tests => 10;
+    use Test::Fatal;
+    use Audio::Chromaprint;
+
+    {
+        like(
+            exception { Audio::Chromaprint->new('SingleInput') },
+            qr/^Expecting a hash as input to constructor/,
+            'Incorrect input for single item (instead of pairs)',
+        );
+
+        like(
+            exception { Audio::Chromaprint->new( 1, 2, 3 ) },
+            qr/^Expecting a hash as input to constructor/,
+            'Incorrect input for odd items (instead of pairs(',
+        );
+
+        is(
+            exception { Audio::Chromaprint->new() },
+            undef,
+            'Successful at calling a constructor without arguments',
+        );
+
+        is(
+            exception { Audio::Chromaprint->new( key => 'value' ) },
+            undef,
+            'Successful at calling a constructor with even items',
+        );
+    }
+
+    {
+        my $cp = Audio::Chromaprint->new();
+
+        isa_ok( $cp, 'Audio::Chromaprint' );
+        is(
+            $cp->{'algorithm'},
+            'test2',
+            'Constructor set correct default algorithm',
+        );
+    }
+
+    {
+        my $cp = Audio::Chromaprint->new(
+            algorithm => 'test3'
+        );
+
+        isa_ok( $cp, 'Audio::Chromaprint' );
+        is(
+            $cp->{'algorithm'},
+            'test3',
+            'Constructor set correct algorithm from argument',
+        );
+
+        is(
+            exception { $cp->{'algorithm'} = 'test1' },
+            undef,
+            'We can change the algorithm key directly',
+        );
+
+        is(
+            $cp->{'algorithm'},
+            'test1',
+            'It was changed correctly',
+        );
+    }
