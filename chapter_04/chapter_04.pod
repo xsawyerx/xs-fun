@@ -381,13 +381,16 @@ Wait, what?
 
 =head3 What's going on?
 
-When you store a value using either C<hv_store> or C<hv_store_ent>, what Perl
-actually does is fetch the value SV for that key and change its PV with a PV
-of the new string you wanted to assign. It's actually much faster than
-creating a new SV.
+When you store a value from XS using either C<hv_store> or
+C<hv_store_ent>, Perl stores the passed SV without making a copy (and
+discarding the previous value for that key if present). On the other
+hand the code executed when assigning to the key from Perl fetches the
+current value SV for that key (creating it if it is a new key) and
+changes its PV with a PV of the new string you wanted to assign.
 
-So if the SV is read-only, this won't work. So how do we fix it? Well, we can
-do various different things:
+So if the SV stored by C<hv_store>/C<hv_store_ent> is read-only, this
+won't work. So how do we fix it? Well, we can do various different
+things:
 
 =over 4
 
