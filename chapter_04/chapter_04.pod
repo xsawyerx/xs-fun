@@ -205,7 +205,7 @@ XSUB:
         /* check the number of input arguments */
         /* "items" represents the argument count */
         if ( ( items - 1 ) % 2 )
-            croak("Expecting a hash as input to constructor\n");
+            croak("Expecting key/value pairs as input to constructor\n");
 
         // ... rest of code ...
 
@@ -220,13 +220,13 @@ We can simply add this following block to the F<t/new.t> test file:
     {
         like(
             exception { Audio::Chromaprint->new('SingleInput') },
-            qr/^Expecting a hash as input to constructor/,
+            qr{^Expecting key/value pairs as input to constructor},
             'Incorrect input for single item (instead of pairs)',
         );
 
         like(
             exception { Audio::Chromaprint->new( 1, 2, 3 ) },
-            qr/^Expecting a hash as input to constructor/,
+            qr{^Expecting key/value pairs as input to constructor},
             'Incorrect input for odd items (instead of pairs(',
         );
 
@@ -286,7 +286,7 @@ This, however, will cause a problem, which we will see.
 
     CODE:
         if ( ( items - 1 ) % 2 )
-            croak("Expecting a hash as input to constructor\n");
+            croak("Expecting key/value pairs as input to constructor\n");
 
         HV *hash = newHV();
 
@@ -481,7 +481,7 @@ The call to C<SvREFCNT_inc> is no longer necessary.
     new( const char *class, ... )
         CODE:
             if ( ( items - 1 ) % 2 )
-                croak("Expecting a hash as input to constructor");
+                croak("Expecting key/value pairs as input to constructor");
 
             HV *hash = newHV();
 
@@ -519,13 +519,13 @@ The call to C<SvREFCNT_inc> is no longer necessary.
     {
         like(
             exception { Audio::Chromaprint->new('SingleInput') },
-            qr/^Expecting a hash as input to constructor/,
+            qr{^Expecting key/value pairs as input to constructor},
             'Incorrect input for single item (instead of pairs)',
         );
 
         like(
             exception { Audio::Chromaprint->new( 1, 2, 3 ) },
-            qr/^Expecting a hash as input to constructor/,
+            qr{^Expecting key/value pairs as input to constructor},
             'Incorrect input for odd items (instead of pairs(',
         );
 

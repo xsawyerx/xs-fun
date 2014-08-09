@@ -14,7 +14,7 @@ SV *
 new( const char *class, ... )
     CODE:
         if ( ( items - 1 ) % 2 )
-            croak("Expecting a hash as input to constructor");
+            croak("Expecting key/value pairs as input to constructor");
 
         HV *hash = newHV();
 
