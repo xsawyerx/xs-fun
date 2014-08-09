@@ -440,6 +440,14 @@ will cause a massive action-at-a-distance behavior in the future, and we
 
 We do B<NOT> want to do this.
 
+=item * Do what Perl does on assignment
+
+Use C<hv_fetch>/C<hv_fetch_ent> with the C<lvalue> flag set, getting
+the SV holding the current value for the key, and use one of the
+C<SvSet*> macros to copy the contents of the SV we got from the stack
+into the SV returned by C<hv_fetch>/C<hv_fetch_ent>. This is more
+efficient (but more convoluted) than the alternative below.
+
 =item * Create a new SV with the value
 
 The best way to handle it is to create a new SV using the SV we got from
