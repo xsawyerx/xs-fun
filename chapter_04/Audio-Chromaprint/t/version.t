@@ -2,8 +2,9 @@
 use strict;
 use warnings;
 
-use Test::More tests => 3;
-use Audio::Chromaprint;
+use Test::More tests => 4;
+
+use_ok( 'Audio::Chromaprint' );
 
 my $cp = Audio::Chromaprint->new();
 isa_ok( $cp, 'Audio::Chromaprint' );
