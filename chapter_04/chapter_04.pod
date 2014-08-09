@@ -447,6 +447,16 @@ the stack. While the SV from the stack will get freed automatically by Perl,
 we will provide our own independent SV, which will not be read-only, and
 which could easily be added to the hash.
 
+=item * Do the same but manually
+
+What Perl does on assignment is fetch the HV using C<hv_fetch>/C<hv_fetch_ent>
+with the C<lvalue> flag set, get the SV holding the current value for the key,
+and use one of the C<SvSet*> macros to copy the contents of the SV we got from
+the stack into the SV returned by C<hv_fetch>/C<hv_fetch_ent>.
+
+While this is more efficient than the alternative above, it is also
+convoluted, so we will keep it for a future chapter.
+
 =back
 
 =head3 Creating a new SV
