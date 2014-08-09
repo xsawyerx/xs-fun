@@ -2,9 +2,10 @@
 
 use strict;
 use warnings;
-use Test::More tests => 10;
+use Test::More tests => 11;
 use Test::Fatal;
-use Audio::Chromaprint;
+
+use_ok( 'Audio::Chromaprint' );
 
 {
     like(

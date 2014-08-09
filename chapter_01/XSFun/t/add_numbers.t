@@ -2,8 +2,9 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8;
-use XSFun ':all';
+use Test::More tests => 9;
+
+use_ok( 'XSFun', ':all' );
 
 # testing integers
 is( add_numbers(  5, 3 ),  8, '5 + 3 = 8'   );

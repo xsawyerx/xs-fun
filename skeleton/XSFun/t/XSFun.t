@@ -2,8 +2,8 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1;
-use XSFun ':all';
+use Test::More tests => 2;
 
-ok( 0, 'Write tests ');
+use_ok('XSFun', ':all');
 
+ok( 0, 'Write some tests' );
