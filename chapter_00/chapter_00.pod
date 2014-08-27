@@ -62,7 +62,7 @@ The F<ppport.h> file (Perl/Pollution/Portability) contains a series of
 macros and, if explicitly requested, functions that allow XS modules to
 be built using older versions of Perl.
 
-You can generate it using the following command:
+Create it in the top-level directory with the following command:
 
     perl -MDevel::PPPort -E'Devel::PPPort::WriteFile'
 
@@ -76,7 +76,7 @@ If you want to optimize something, you can simply implement it directly in
 the XS file. If you want to connect to another library, you will use the
 XS code in order to glue together an existing library and Perl.
 
-Create the file F<XSFun.xs> with the following content:
+Create the file F<XSFun.xs> in the top-level directory with the following content:
 
     #define PERL_NO_GET_CONTEXT
     #include "EXTERN.h"
