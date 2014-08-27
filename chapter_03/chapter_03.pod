@@ -40,6 +40,10 @@ You can generate the F<ppport.h> file using the following command:
 
     perl -MDevel::PPPort -E'Devel::PPPort::WriteFile'
 
+Or on Windows cmd.exe with Strawberry Perl:
+
+	perl -MDevel::PPPort -E"Devel::PPPort::WriteFile"
+
 =head3 Chromaprint.pm
 
 Create a directory structure F<lib/Audio> and inside the file
@@ -74,10 +78,7 @@ The F<MANIFEST> file can be easily created with the command:
     # Perl on GNU/Linux, BSD, Solaris:
     perl Makefile.PL && make manifest && make distclean
 
-    # Strawberry Perl on Windows:
-    perl Makefile.PL
-    dmake manifest
-    dmake distclean
+(if you're using Strawberry Perl on Windows, use C<dmake> instead of C<make>)
 
 =head3 Chromaprint.xs
 
@@ -241,7 +242,7 @@ Try it out:
 
     perl Makefile.PL && make && make test
 
-(if you're using Strawberry Perl, use C<dmake> instead of C<make>)
+(if you're using Strawberry Perl on Windows, use C<dmake> instead of C<make>)
 
 =head2 To increment or not to increment
 

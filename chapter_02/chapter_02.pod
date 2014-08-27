@@ -53,3 +53,5 @@ Now try to compile and run the code:
 
     perl Makefile.PL && make && make test
 
+(if you're using Strawberry Perl on Windows, use C<dmake> instead of C<make>)
+
