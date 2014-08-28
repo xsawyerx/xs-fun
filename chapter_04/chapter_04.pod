@@ -243,6 +243,12 @@ We can simply add this following block to the F<t/new.t> test file:
         );
     }
 
+    # ... rest of tests ...
+
+And don't forget to update the test plan:
+
+    use Test::More tests => 8;
+
 Trying it out...
 
     1..8
