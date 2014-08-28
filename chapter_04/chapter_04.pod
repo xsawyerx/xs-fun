@@ -7,15 +7,15 @@ but usually we need more than that. If we want to improve our constructor,
 we would need to make it update the attributes we keep in the hash.
 
 Of course, one more important feature is being able to provide attribute
-subroutines. They will allow us to fetch the attribute from the hash and
-to set a new value - what's called I<full affordance accessors>.
+subroutines. They will allow us to fetch the attribute from the hash and to
+set a new value - what's called I<full affordance accessors>.
 
-This chapter will start with creating a default value for an attribute
-(or, rather, a key in our C<$self> hash), and will then focus on improving
-the accessor by letting it set the attribute value by user arguments.
+This chapter will start with creating a default value for an attribute (or,
+rather, a key in our C<$self> hash), and will then focus on improving the
+accessor by letting it set the attribute value by user arguments.
 
-Since this covers quite a lot of ground, we will leave the accessors to
-a future chapter.
+Since this covers quite a lot of ground, we will leave the accessors to a
+future chapter.
 
 Let's dig in!
 
@@ -24,10 +24,10 @@ Let's dig in!
 To make sure we don't screw up, we will write some tests. They will cover
 checking our constructor.
 
-Reading the documentation for B<Chromaprint>, we see that there's an attribute
-defining the algorithm to be used. It has a default, B<test2> (or the actual
-constant name, B<CHROMAPRINT_ALGORITHM_TEST2>). Let's test that we're setting
-it properly.
+Reading the documentation for B<Chromaprint>, we see that there's an
+attribute defining the algorithm to be used. It has a default, B<test2> (or
+the actual constant name, B<CHROMAPRINT_ALGORITHM_TEST2>). Let's test that
+we're setting it properly.
 
 =head3 new.t
 
@@ -55,12 +55,12 @@ When running the test, we can ask the testing harness to only run the new
 test file we wrote and nothing else.
 
 Assuming we have the default template with nothing in it, running the test
-will work as such:
+will work like so:
 
     $ perl Makefile.PL
     $ make && make test TEST_VERBOSE=1 TEST_FILES="t/new.t"
 
-Once we ran the F<Makefile.PL>, we have a given F<Makefile> file, and it
+After we have run the F<Makefile.PL>, we have a F<Makefile> file, and it
 allows us to repeat the C<make && make test> line as many times as we want.
 
 Here is the output:
@@ -83,8 +83,8 @@ value. Let's fix it.
 =head2 Adding a default value
 
 To add a default value, we would need to add data to the hash. This means
-creating a new value (B<test2>) and setting it in a key in the hash
-we created.
+creating a new value (B<test2>) and setting it in a key in the hash we
+created.
 
 We can use C<hv_store> (which can be found it L<perlapi>) in order to store
 a new value in the hash we created in the previous chapter. Let's add it:
@@ -129,15 +129,14 @@ It works!
 
 =head2 Smarter constructor
 
-Now that we have a default, we would like the user to be able to set it
-to anything it wants.
+Now that we have a default, we would like the user to be able to set it to
+anything they wish.
 
 =head3 Improving our test
 
-Let's write a test to reflect what we want to happen. We'll start with
-what we have and add another chunk that changes the value using the
-constructor. We put each chunk its own scope so we don't override the
-variables.
+Let's write a test to reflect what we want to happen. We'll start with what
+we have and add another chunk that changes the value using the constructor.
+We put each chunk in its own scope so we don't override the variables.
 
     #!perl
 
@@ -191,10 +190,10 @@ variables.
 We are now failing because we're not setting the attribute value using the
 argument provided by our test. We need to fix it.
 
-=head3 Checking input better
+=head3 Checking the input better
 
-If we want to handle key/value pairs as input to the constructor, we need
-to have a better check of the input. What if we expect a pair and the user
+If we want to handle key/value pairs as input to the constructor, we need to
+have a better check of the input. What if we expect a pair and the user
 sends in a hash reference? What if it's an array reference? Let's be more
 explicit in what we allow before we try to analyze it.
 
@@ -243,6 +242,12 @@ We can simply add this following block to the F<t/new.t> test file:
         );
     }
 
+    # ... rest of tests ...
+
+And don't forget to update the test plan:
+
+    use Test::More tests => 8;
+
 Trying it out...
 
     1..8
@@ -269,18 +274,18 @@ the input from the user.
 =head3 Looping over the Perl stack
 
 The Perl interpreter puts all the variables from the Perl side on a stack.
-The stack has pointers to SVs that represent what the user sent to the XSUB.
-Pretty simple. It's actually that simple to play with it too.
+The stack has pointers to C<SV>s that represent what the user sent to the
+XSUB.  Pretty simple. It's actually that simple to play with it too.
 
 Right after our code that goes over the items, we can loop over the stack
 (available using the C<ST> macro) and use the information there to add
 variables to the hash we created.
 
 Let's take a look at a simple example that will use C<hv_store_ent> (which
-can also find in L<perlapi>). We used the C<hv_store> function in the default
-because we had strings for the key and value. However, in this case, because
-we get SVs from the stack, we can use C<hv_store_ent>, which allows us to
-store using SVs for key and value.
+you can also find in L<perlapi>). We used the C<hv_store> function in the
+default because we had strings for the key and value. However, in this case,
+because we get C<SV>s from the stack, we can use C<hv_store_ent>, which
+allows us to store using C<SV>s for key and value.
 
 This, however, will cause a problem, which we will see.
 
@@ -318,21 +323,23 @@ If we actually run this code, we will get this warning in our output:
     Attempt to free unreferenced scalar: SV 0x26f9ac0, Perl interpreter:
     0x24c5010.
 
-The reason is simple, but the explanation is a bit tricky to follow.[1]
+The reason is simple, but the explanation can be a bit tricky to follow.[1]
 
-When we pick the SV from the stack, it has no actual references to it. Okay,
-I'm lying. It has one, which is the one from the op code, but that will just
-confuse you - better to think of it as I<no one is holding on to this>.
+When we pick the C<SV> from the stack, it effectively has no actual
+references to it. Okay, I'm lying. It has one, which is the one from the op
+code, but that is likely to be confusing - better to think of it as I<no one
+is holding on to this>.
 
-This is why Perl actually releases it before it even exits the scope in which
-it's running in the test. When it exits the scope, it tries to release it yet
-again, but it fails, because it has already been released, hence the warning.
+This is why Perl actually releases it before it even exits the scope in
+which it's running in the test. When it exits the scope, it tries to release
+it yet again, but it fails, because it has already been released, hence the
+warning.
 
 If we read the documentation of C<hv_store_ent> in C<perlapi>, it has the
 following sentence: I<Note that the caller is responsible for suitably
 incrementing the reference count of "val" before the call>.
 
-So we can simply increment the reference count for the SV.
+So we can simply increment the reference count for the C<SV>.
 
     /* get two items from the stack  */
     /* it starts from 1 in this case */
@@ -359,13 +366,13 @@ Running the tests:
 
 I<[1] If you find this confusing, please help me correct it!>
 
-
 =head2 More problems
 
 There is a side-effect we get here that, unless we understand how things
 work, will bite us at some point without us even realizing it.
 
-If you add the following to the test code:
+If you add the following to the C<Constructor set correct algorithm from
+argument> test code:
 
     $cp->{'algorithm'} = 'test1';
 
@@ -381,27 +388,26 @@ Wait, what?
 
 =head3 What's going on?
 
-When you store a value from XS using either C<hv_store> or
-C<hv_store_ent>, Perl stores the passed SV without making a copy (and
-discarding the previous value for that key if present). On the other
-hand the code executed when assigning to the key from Perl fetches the
-current value SV for that key (creating it if it is a new key) and
-changes its PV with a PV of the new string you wanted to assign.
+When you store a value from XS using either C<hv_store> or C<hv_store_ent>,
+Perl stores the passed C<SV> without making a copy (and discarding the
+previous value for that key, if present). On the other hand the code
+executed when assigning to the key from Perl fetches the current value C<SV>
+for that key (creating it if it is a new key) and changes its C<PV> with a
+C<PV> of the new string you wanted to assign.
 
-So if the SV stored by C<hv_store>/C<hv_store_ent> is read-only, this
-won't work. So how do we fix it? Well, we can do various different
-things:
+So if the C<SV> stored by C<hv_store>/C<hv_store_ent> is read-only, this
+won't work. So how do we fix it? Well, we can do various different things:
 
 =over 4
 
-=item * Send a variable instead of string
+=item * Send a variable instead of a string
 
-Current we use the C<new> method as such:
+Currently we use the C<new> method like so:
 
     my $cp = Algorithm::Chromaprint->new( algorithm => 'test3' );
 
-B<test3> here is a static string. It's not a variable. This is why, if we
-dump the variable using C<sv_dump> in the XS, as such:
+B<test3> here is a static string. It's not a variable. This is why if we
+dump the variable using C<sv_dump> in the XS, as follows:
 
     SV *value = ST( i + 1 );
 
@@ -427,49 +433,89 @@ We can just send a variable instead:
     my $algo = 'test3';
     my $cp   = Audio::Chromaprint->new( algorithm => $algo );
 
-But... do we really want to do it this way? No. We don't. Besides, we want to
-make sure the SV has the right reference count. We're responsible for it.
+But... do we really want to do it this way? No. We don't. Besides, we want
+to make sure the C<SV> has the right reference count. We're responsible for
+it.
 
 =item * Remove the READONLY flag
 
 The next chapter will side-track to cover the B<READONLY> flag and will help
-understand this better. Suffice to say that, while it's possible to simply
-disable the B<READONLY> restriction and then change the value anyway, this
-will cause a massive action-at-a-distance behavior in the future, and we
-(and everyone we care about) will hate us forever for this.
+us to understand this better. Suffice it to say that, while it's possible to
+simply disable the B<READONLY> restriction and then change the value anyway,
+this will cause a massive action-at-a-distance behavior in the future, and
+we (and everyone we care about) will hate us forever for this.
 
 We do B<NOT> want to do this.
 
-=item * Create a new SV with the value
+=item * Create a new C<SV> with the value
 
-The best way to handle it is to create a new SV using the SV we got from
-the stack. While the SV from the stack will get freed automatically by Perl,
-we will provide our own independent SV, which will not be read-only, and
-which could easily be added to the hash.
+The best way to handle it is to create a new C<SV> using the C<SV> we got
+from the stack. While the C<SV> from the stack will get freed automatically
+by Perl, we will provide our own independent C<SV>, which will not be
+read-only, and which could easily be added to the hash.
 
 =item * Do the same but manually
 
-What Perl does on assignment is fetch the HV using C<hv_fetch>/C<hv_fetch_ent>
-with the C<lvalue> flag set, get the SV holding the current value for the key,
-and use one of the C<SvSet*> macros to copy the contents of the SV we got from
-the stack into the SV returned by C<hv_fetch>/C<hv_fetch_ent>.
+What Perl does on assignment is fetch the C<HV> using
+C<hv_fetch>/C<hv_fetch_ent> with the C<lvalue> flag set, get the C<SV>
+holding the current value for the key, and use one of the C<SvSet*> macros
+to copy the contents of the C<SV> we got from the stack into the C<SV>
+returned by C<hv_fetch>/C<hv_fetch_ent>.
 
 While this is more efficient than the alternative above, it is also
 convoluted, so we will keep it for a future chapter.
 
 =back
 
-=head3 Creating a new SV
+=head3 Creating a new C<SV>
 
-To create a new SV, we use C<newSVsv>, which creates a new SV from an
-existing SV. This means that whether the user provided a value which is a
+To create a new C<SV>, we use C<newSVsv>, which creates a new C<SV> from an
+existing C<SV>. This means that whether the user provided a value which is a
 string (PV), an integer (IV), or a double (NV), we will have it in the new
-SV.
+C<SV>.
 
     SV *key   = ST(i);
     SV *value = newSVsv( ST( i + 1 ) );
 
 The call to C<SvREFCNT_inc> is no longer necessary.
+
+To ensure that this code behaves the way we indend it to, we add the
+following two tests after the C<Constructor set correct algorithm from
+argument> test:
+
+    is(
+	exception { $cp->{'algorithm'} = 'test1' },
+	undef,
+	'We can change the algorithm key directly',
+    );
+
+    is(
+	$cp->{'algorithm'},
+	'test1',
+	'It was changed correctly',
+    );
+
+and update the test plan to match the new number of tests:
+
+    use Test::More tests => 10;
+
+Running the tests, we should see that everything works. Yay!
+
+    $ make && make test TEST_VERBOSE=1 TEST_FILES="t/new.t"
+
+    1..10
+    ok 1 - Incorrect input for single item (instead of pairs)
+    ok 2 - Incorrect input for odd items (instead of pairs(
+    ok 3 - Successful at calling a constructor without arguments
+    ok 4 - Successful at calling a constructor with even items
+    ok 5 - An object of class 'Audio::Chromaprint' isa 'Audio::Chromaprint'
+    ok 6 - Constructor set correct default algorithm
+    ok 7 - An object of class 'Audio::Chromaprint' isa 'Audio::Chromaprint'
+    ok 8 - Constructor set correct algorithm from argument
+    ok 9 - We can change the algorithm key directly
+    ok 10 - It was changed correctly
+    ok
+    All tests successful.
 
 =head2 Finishing
 

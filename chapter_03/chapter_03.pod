@@ -112,8 +112,8 @@ Our previous C<get_version> function had one major problem: it assumed that
 we did not have any parameters.
 
 If you are unfamiliar with methods in Perl, it's important to know that when
-you call a method, it will send the object as the first parameter. Assuming we
-were using an object oriented interface:
+you call a method, it will send the object as the first parameter. Assuming
+we were using an object oriented interface:
 
     $object->my_method();
 
@@ -130,8 +130,8 @@ assumes there are no parameters, it will fail. The XS layer will generate a
 check for any possible arguments and will croak mentioning the "proper" way
 of calling it (assuming it shouldn't receive parameters at all).
 
-In order to fix this, the only thing we need is to include a parameter in the
-name definition for the function, which will now be a method:
+In order to fix this, the only thing we need is to include a parameter in
+the name definition for the function, which will now be a method:
 
     const char *
     version(SV *self)
@@ -139,31 +139,31 @@ name definition for the function, which will now be a method:
             RETVAL = chromaprint_get_version();
         OUTPUT: RETVAL
 
-This way the XS layer will generate a check that the function is called as
-a method (providing at least one parameter, an SV), instead of being called
-as a function with no parameters.
+This way the XS layer will generate a check that the function is called as a
+method (providing at least one parameter, an SV), instead of being called as
+a function with no parameters.
 
 You will notice we also took the liberty to change the method name to
 C<version>.
 
 =head2 A C<version> method as in Perl
 
-The above C<version> method will be a Perl sub that B<requires exactly one parameter>.
-That means in Perl, it can be called in two ways:
+The above C<version> method will be a Perl sub that B<requires exactly one
+parameter>.  That means in Perl, it can be called in two ways:
 
     $obj->version()
     version($obj)
 
-So the XSUB behaves equally indiscriminate as any other sub would do in
-Perl. The only difference is that if the method was implemented in Perl,
-it wouldn't use its object parameter at all, so
+So the XSUB behaves just the same as any other sub would do in Perl. The
+only difference is that if the method were implemented in Perl, it wouldn't
+use its object parameter at all, so
 
-    version() # look ma, no arguments
+    version() # look Ma, no arguments!
 
-would also be legal. The XSUB will C<croak> on that. In this case
-that is probably a good thing. But if you wanted it to behave even more
-like an actual Perl function that could be called without arguments,
-the XS code would look like this instead:
+would also be legal. However, the XSUB will C<croak> on that. In this case
+that is probably a good thing. But if you wanted it to behave even more like
+an actual Perl function that could be called without arguments, the XS code
+would look like this instead:
 
     const char *
     version(...)
@@ -172,14 +172,14 @@ the XS code would look like this instead:
         OUTPUT: RETVAL
 
 See what we did there? We dropped the explicit parameter C<self> and
-replaced it with C<...>, which basically says "any number of parameters
-is okay". Later on we will how to actually use parameters passed to
-such a variadic XSUB.
+replaced it with C<...>, which basically says "any number of parameters is
+okay". Later on we will see how to actually use parameters passed to such a
+variadic XSUB.
 
 =head2 Add method: new
 
-In order to call C<version> as a method, we need a blessed hash reference. We
-can easily create one with the following code inside F<Chromaprint.pm>:
+In order to call C<version> as a method, we need a blessed hash reference.
+We can easily create one with the following code inside F<Chromaprint.pm>:
 
     sub new { bless {}, shift }
 
@@ -204,9 +204,10 @@ However, as we're trying to practice XS, let us do it in XS:
 C<newHV> creates a new hash value. It returns a pointer to a hash value
 structure (C<HV>).
 
-Then we want to create a reference to it (C<RV> - Reference Value structure).
-C<newRV_inc> and C<newRV_noinc> create a reference from an SV. It expects an
-SV, so we cast our HV as one. We return the data back into a new SV.
+Then we want to create a reference to it (C<RV> - Reference Value
+structure).  C<newRV_inc> and C<newRV_noinc> create a reference from an SV.
+It expects an SV, so we cast our HV as one. We return the data back into a
+new SV.
 
 The last step is to bless the SV. We use C<gv_stashpv> to fetch a pointer to
 the stash of a specified package. We send it the class name as the package,
@@ -215,14 +216,15 @@ C<sv_bless> is called with the hash reference we created with C<newRV_noinc>
 and the pointer from C<gv_stashpv>.
 
 In case you're wondering where the heck that weird C<RETVAL> thing is coming
-from: It's a C variable that is automatically declared for us and which has the
-same type as the return value of the XSUB. We can set it in our XS code and
-then tell the XS compiler using C<OUTPUT: RETVAL> that yes, really, its
+from: It's a C variable that is automatically declared for us and which has
+the same type as the return value of the XSUB. We can set it in our XS code
+and then tell the XS compiler using C<OUTPUT: RETVAL> that yes, really, its
 content is to be returned to Perl.
 
 =head2 Testing
 
-Let's write a test for our code. We can write the following as F<t/version.t>:
+Let's write a test for our code. We can write the following as
+F<t/version.t>:
 
     #!perl
     use strict;
@@ -245,28 +247,28 @@ Try it out:
 
 =head2 To increment or not to increment
 
-You might notice both C<newRV_inc> and C<newRV_noinc> were mentioned, but only
-C<newRV_noinc> was used. Why is that?
+You might notice both C<newRV_inc> and C<newRV_noinc> were mentioned, but
+only C<newRV_noinc> was used. Why is that?
 
-Perl uses a reference counting memory management system. When a new value
-is created, its reference count is set to be 1. No matter whether it came
-into life as a variable in Perl code, as a temporary deep inside
-the bowels of the runtime, or explicitly using C<newRV*> or its siblings
-in your XS code.
+Perl uses a reference counting memory management system. When a new value is
+created, its reference count is set to 1. No matter whether it came into
+life as a variable in Perl code, as a temporary deep inside the bowels of
+the runtime, or explicitly using C<newRV*> or its siblings in your XS code.
 
 Perl keeps a count of "live" values (technically, the most generic form of a
-Perl value is an C<SV>) using this count of things that refer to it.
+Perl value is an C<SV>) using the count of things that refer to it.
 
-When they go out of scope, or get explicitly C<undef>ed, their reference count
-is decremented. When it reaches zero, perl (the interpreter) knows
-it can free that value and will generally do so immediately.
+When they go out of scope, or get explicitly C<undef>ed, their reference
+count is decremented. When it reaches zero, perl (the interpreter) knows it
+can free that value and will generally do so immediately.
 
-When we create an C<HV>, it has a single reference count. Our code effectively
-"owns" that value. When we create an C<RV> that points at the C<HV>,
-the C<RV> should now own its on reference count to the C<HV>.
+When we create an C<HV>, it has a single reference count. Our code
+effectively "owns" that value. When we create an C<RV> that points at the
+C<HV>, the C<RV> should now have its own reference count to the C<HV>.
 
-We can now use C<newRV_inc> to create the C<RV>. That I<inc>rements the hash's
-reference count to 2, and both the C<RV> and our code own one reference to it.
+We can now use C<newRV_inc> to create the C<RV>. That I<inc>rements the
+hash's reference count to 2, and both the C<RV> and our code own one
+reference to it.
 
 C<newRV_noinc> creates an C<RV> without increasing the reference count.
 Generally, this means that the C<RV> is taking ownership of one of the
@@ -294,13 +296,13 @@ To understand this better write the following test in F<t/leak.t>:
     cmp_ok( $called, '==', 1, 'Destruction successful' );
 
 In this test we add a C<DESTROY> method to the C<Audio::Chromaprint> package
-namespace, which will get called when the object is entirely destroyed. We use
-that method to increment a counter. Then we create an object in an internal
-scope. Once out of the scope, we check that the counter was called once and
-only once.
+namespace, which will get called when the object is entirely destroyed. We
+use that method to increment a counter. Then we create an object in an
+internal scope. Once out of the scope, we check that the counter was called
+once and only once.
 
 If you run C<make test>, it will succeed. Try changing in the XS code the
 C<newRV_noinc> to C<newRV_inc>, rebuild and rerun the test. It will fail
-because there's a stray reference to the objects' C<HV>s and they will
-never be freed (and the destructor never called).
+because there's a stray reference to the objects' C<HV>s and they will never
+be freed (and the destructor will never be called).
 
