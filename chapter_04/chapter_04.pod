@@ -111,7 +111,7 @@ a new value in the hash we created in the previous chapter. Let's add it:
             );
 
             SV* const self = newRV_noinc( (SV *)hash );
-    
+
             RETVAL = sv_bless( self, gv_stashpv( class, 0 ) );
         OUTPUT: RETVAL
 
@@ -303,7 +303,7 @@ This, however, will cause a problem, which we will see.
             /* get two items from the stack  */
             /* it starts from 1 in this case */
             SV *key   = ST(i);
-            SV *value = ST( i + 1 ); 
+            SV *value = ST( i + 1 );
 
             /* store the value by key in the hash */
             hv_store_ent( hash, key, value, 0 );
