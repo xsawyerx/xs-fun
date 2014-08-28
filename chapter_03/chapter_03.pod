@@ -154,13 +154,13 @@ That means in Perl, it can be called in two ways:
     $obj->version()
     version($obj)
 
-So the XSUB behaves equally indiscriminate as any other sub would do in
-Perl. The only difference is that if the method was implemented in Perl,
+So the XSUB behaves just the same as any other sub would do in
+Perl. The only difference is that if the method were implemented in Perl,
 it wouldn't use its object parameter at all, so
 
-    version() # look ma, no arguments
+    version() # look Ma, no arguments!
 
-would also be legal. The XSUB will C<croak> on that. In this case
+would also be legal. However, the XSUB will C<croak> on that. In this case
 that is probably a good thing. But if you wanted it to behave even more
 like an actual Perl function that could be called without arguments,
 the XS code would look like this instead:
@@ -173,7 +173,7 @@ the XS code would look like this instead:
 
 See what we did there? We dropped the explicit parameter C<self> and
 replaced it with C<...>, which basically says "any number of parameters
-is okay". Later on we will how to actually use parameters passed to
+is okay". Later on we will see how to actually use parameters passed to
 such a variadic XSUB.
 
 =head2 Add method: new
@@ -249,13 +249,13 @@ You might notice both C<newRV_inc> and C<newRV_noinc> were mentioned, but only
 C<newRV_noinc> was used. Why is that?
 
 Perl uses a reference counting memory management system. When a new value
-is created, its reference count is set to be 1. No matter whether it came
+is created, its reference count is set to 1. No matter whether it came
 into life as a variable in Perl code, as a temporary deep inside
 the bowels of the runtime, or explicitly using C<newRV*> or its siblings
 in your XS code.
 
 Perl keeps a count of "live" values (technically, the most generic form of a
-Perl value is an C<SV>) using this count of things that refer to it.
+Perl value is an C<SV>) using the count of things that refer to it.
 
 When they go out of scope, or get explicitly C<undef>ed, their reference count
 is decremented. When it reaches zero, perl (the interpreter) knows
@@ -263,7 +263,7 @@ it can free that value and will generally do so immediately.
 
 When we create an C<HV>, it has a single reference count. Our code effectively
 "owns" that value. When we create an C<RV> that points at the C<HV>,
-the C<RV> should now own its on reference count to the C<HV>.
+the C<RV> should now have its own reference count to the C<HV>.
 
 We can now use C<newRV_inc> to create the C<RV>. That I<inc>rements the hash's
 reference count to 2, and both the C<RV> and our code own one reference to it.
@@ -302,5 +302,5 @@ only once.
 If you run C<make test>, it will succeed. Try changing in the XS code the
 C<newRV_noinc> to C<newRV_inc>, rebuild and rerun the test. It will fail
 because there's a stray reference to the objects' C<HV>s and they will
-never be freed (and the destructor never called).
+never be freed (and the destructor will never be called).
 
