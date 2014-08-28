@@ -24,8 +24,8 @@ I<double> and as you can see by the definition, it also returns a I<double>
 type.
 
 We have a I<CODE> section which sets the return value (I<RETVAL>) to the sum
-of I<a> and I<b>. We also have an I<OUTPUT> section that indicates the output
-is the return value (I<RETVAL>).
+of I<a> and I<b>. We also have an I<OUTPUT> section that indicates the
+output is the return value (I<RETVAL>).
 
 =head2 A Touch of Perl API
 
@@ -50,8 +50,8 @@ As soon as we compile our code, the function will be available to the
 B<XSFun> package and be callable as C<XSFun::add_numbers>.  However, in case
 we want users to call it as simply C<add_numbers>, we need to export it.
 
-Open F<lib/XSFun.pm> and fix the C<%EXPORT_TAGS> variable to include this new
-function:
+Open F<lib/XSFun.pm> and fix the C<%EXPORT_TAGS> variable to include this
+new function:
 
     our %EXPORT_TAGS = ( 'all' => [qw<add_numbers add_numbers_perl>] );
 
@@ -92,10 +92,10 @@ You can also run the following command to clean up your directory:
 
 I<Why use C<Test::More::is> instead of C<Test::More::cmp_ok>?>
 
-Usually we would use L<Test::More>'s C<cmp_ok()> to test numerical values, but
-in this case we picked C<is()>. The reason is that the result we get back from
-our function has a different absolute value from the one we check for in the
-function, because of how Perl stores floating point values.
+Usually we would use L<Test::More>'s C<cmp_ok()> to test numerical values,
+but in this case we picked C<is()>. The reason is that the result we get
+back from our function has a different absolute value from the one we check
+for in the function, because of how Perl stores floating point values.
 
 We can use C<sprintf()> to show the differences:
 

@@ -4,8 +4,8 @@
 
 Let's start by creating the basic layout for our module.
 
-Create a directory for the project called F<XSFun>. Enter the directory
-and begin creating the following files.
+Create a directory for the project called F<XSFun>. Enter the directory and
+begin creating the following files.
 
 =head3 XSFun.pm
 
@@ -59,8 +59,8 @@ proper F<Makefile>, content as follows:
 =head3 ppport.h
 
 The F<ppport.h> file (Perl/Pollution/Portability) contains a series of
-macros and, if explicitly requested, functions that allow XS modules to
-be built using older versions of Perl.
+macros and, if explicitly requested, functions that allow XS modules to be
+built using older versions of Perl.
 
 You can generate it using the following command:
 
@@ -73,8 +73,8 @@ will insert C code into it, but with time we will use it to connect to
 existing libraries.
 
 If you want to optimize something, you can simply implement it directly in
-the XS file. If you want to connect to another library, you will use the
-XS code in order to glue together an existing library and Perl.
+the XS file. If you want to connect to another library, you will use the XS
+code in order to glue together an existing library and Perl.
 
 Create the file F<XSFun.xs> with the following content:
 
@@ -90,20 +90,19 @@ Create the file F<XSFun.xs> with the following content:
 
     # XS code
 
-The first line changes the compiled C code so it does not fetch the
-context every time it calls a Perl API function. This will make the
-code more efficient at the cost of being aware of MULTIPLICITY and
-threads. While this is a somewhat vague description, it should
-generally be used as it will make your XS code faster when run
-under threaded perls, without any additional work, I<unless>
-you define helper C functions in your XS file (and even in that case
-the additional work is minimal), which is good enough for us to add
-it. It's considered a modern XS practice.
+The first line changes the compiled C code so it does not fetch the context
+every time it calls a Perl API function. This will make the code more
+efficient at the cost of being aware of MULTIPLICITY and threads. While this
+is a somewhat vague description, it should generally be used as it will make
+your XS code faster when run under threaded perls, without any additional
+work, I<unless> you define helper C functions in your XS file (and even in
+that case the additional work is minimal), which is good enough for us to
+add it. It's considered a modern XS practice.
 
-The next three lines are XS headers. The last include line uses the portability
-layer of F<ppport.h>. After that we can insert any C code we want. Then,
-we give enough XS information to connect this XS file to our Perl code.
-Afterwards we can provide more advanced XS functionality.
+The next three lines are XS headers. The last include line uses the
+portability layer of F<ppport.h>. After that we can insert any C code we
+want. Then, we give enough XS information to connect this XS file to our
+Perl code.  Afterwards we can provide more advanced XS functionality.
 
 From this point on we will use this setup as our skeleton. You can save it
 separately and copy it over in every new chapter.
