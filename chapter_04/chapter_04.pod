@@ -478,6 +478,44 @@ C<SV>.
 
 The call to C<SvREFCNT_inc> is no longer necessary.
 
+To ensure that this code behaves the way we indend it to, we add the
+following two tests after the C<Constructor set correct algorithm from
+argument> test:
+
+    is(
+	exception { $cp->{'algorithm'} = 'test1' },
+	undef,
+	'We can change the algorithm key directly',
+    );
+
+    is(
+	$cp->{'algorithm'},
+	'test1',
+	'It was changed correctly',
+    );
+
+and update the test plan to match the new number of tests:
+
+    use Test::More tests => 10;
+
+Running the tests, we should see that everything works. Yay!
+
+    $ make && make test TEST_VERBOSE=1 TEST_FILES="t/new.t"
+
+    1..10
+    ok 1 - Incorrect input for single item (instead of pairs)
+    ok 2 - Incorrect input for odd items (instead of pairs(
+    ok 3 - Successful at calling a constructor without arguments
+    ok 4 - Successful at calling a constructor with even items
+    ok 5 - An object of class 'Audio::Chromaprint' isa 'Audio::Chromaprint'
+    ok 6 - Constructor set correct default algorithm
+    ok 7 - An object of class 'Audio::Chromaprint' isa 'Audio::Chromaprint'
+    ok 8 - Constructor set correct algorithm from argument
+    ok 9 - We can change the algorithm key directly
+    ok 10 - It was changed correctly
+    ok
+    All tests successful.
+
 =head2 Finishing
 
 =head3 Chromaprint.xs
