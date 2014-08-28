@@ -98,9 +98,9 @@ The first line changes the compiled C code so it does not fetch the
 context every time it calls a Perl API function. This will make the
 code more efficient at the cost of being aware of MULTIPLICITY and
 threads. While this is a somewhat vague description, it should
-generally be regarded as, it will make my XS code faster when used
-under threaded perls, without any additional work from me, I<unless>
-I'm defining helper C functions in my XS file (and even in that case
+generally be used as it will make your XS code faster when run
+under threaded perls, without any additional work, I<unless>
+you define helper C functions in your XS file (and even in that case
 the additional work is minimal), which is good enough for us to add
 it. It's considered a modern XS practice.
 
