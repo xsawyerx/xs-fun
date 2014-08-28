@@ -55,12 +55,12 @@ When running the test, we can ask the testing harness to only run the new
 test file we wrote and nothing else.
 
 Assuming we have the default template with nothing in it, running the test
-will work as such:
+will work like so:
 
     $ perl Makefile.PL
     $ make && make test TEST_VERBOSE=1 TEST_FILES="t/new.t"
 
-Once we ran the F<Makefile.PL>, we have a given F<Makefile> file, and it
+After we have run the F<Makefile.PL>, we have a F<Makefile> file, and it
 allows us to repeat the C<make && make test> line as many times as we want.
 
 Here is the output:
@@ -130,13 +130,13 @@ It works!
 =head2 Smarter constructor
 
 Now that we have a default, we would like the user to be able to set it
-to anything it wants.
+to anything they wish.
 
 =head3 Improving our test
 
 Let's write a test to reflect what we want to happen. We'll start with
 what we have and add another chunk that changes the value using the
-constructor. We put each chunk its own scope so we don't override the
+constructor. We put each chunk in its own scope so we don't override the
 variables.
 
     #!perl
@@ -191,7 +191,7 @@ variables.
 We are now failing because we're not setting the attribute value using the
 argument provided by our test. We need to fix it.
 
-=head3 Checking input better
+=head3 Checking the input better
 
 If we want to handle key/value pairs as input to the constructor, we need
 to have a better check of the input. What if we expect a pair and the user
@@ -283,7 +283,7 @@ Right after our code that goes over the items, we can loop over the stack
 variables to the hash we created.
 
 Let's take a look at a simple example that will use C<hv_store_ent> (which
-can also find in L<perlapi>). We used the C<hv_store> function in the default
+you can also find in L<perlapi>). We used the C<hv_store> function in the default
 because we had strings for the key and value. However, in this case, because
 we get C<SV>s from the stack, we can use C<hv_store_ent>, which allows us to
 store using C<SV>s for key and value.
@@ -324,11 +324,11 @@ If we actually run this code, we will get this warning in our output:
     Attempt to free unreferenced scalar: SV 0x26f9ac0, Perl interpreter:
     0x24c5010.
 
-The reason is simple, but the explanation is a bit tricky to follow.[1]
+The reason is simple, but the explanation can be a bit tricky to follow.[1]
 
-When we pick the SV from the stack, it has no actual references to it. Okay,
-I'm lying. It has one, which is the one from the op code, but that will just
-confuse you - better to think of it as I<no one is holding on to this>.
+When we pick the C<SV> from the stack, it effectively has no actual references to it. Okay,
+I'm lying. It has one, which is the one from the op code, but that is likely
+to be confusing - better to think of it as I<no one is holding on to this>.
 
 This is why Perl actually releases it before it even exits the scope in which
 it's running in the test. When it exits the scope, it tries to release it yet
@@ -365,13 +365,13 @@ Running the tests:
 
 I<[1] If you find this confusing, please help me correct it!>
 
-
 =head2 More problems
 
 There is a side-effect we get here that, unless we understand how things
 work, will bite us at some point without us even realizing it.
 
-If you add the following to the test code:
+If you add the following to the C<Constructor set correct algorithm from
+argument> test code:
 
     $cp->{'algorithm'} = 'test1';
 
@@ -400,14 +400,14 @@ things:
 
 =over 4
 
-=item * Send a variable instead of string
+=item * Send a variable instead of a string
 
-Current we use the C<new> method as such:
+Currently we use the C<new> method like so:
 
     my $cp = Algorithm::Chromaprint->new( algorithm => 'test3' );
 
-B<test3> here is a static string. It's not a variable. This is why, if we
-dump the variable using C<sv_dump> in the XS, as such:
+B<test3> here is a static string. It's not a variable. This is why if we
+dump the variable using C<sv_dump> in the XS, as follows:
 
     SV *value = ST( i + 1 );
 
@@ -439,7 +439,7 @@ make sure the C<SV> has the right reference count. We're responsible for it.
 =item * Remove the READONLY flag
 
 The next chapter will side-track to cover the B<READONLY> flag and will help
-understand this better. Suffice to say that, while it's possible to simply
+us to understand this better. Suffice it to say that, while it's possible to simply
 disable the B<READONLY> restriction and then change the value anyway, this
 will cause a massive action-at-a-distance behavior in the future, and we
 (and everyone we care about) will hate us forever for this.
