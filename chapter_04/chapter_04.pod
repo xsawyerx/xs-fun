@@ -432,11 +432,10 @@ make sure the SV has the right reference count. We're responsible for it.
 
 =item * Remove the READONLY flag
 
-The next chapter will side-track to cover the B<READONLY> flag and will help
-understand this better. Suffice to say that, while it's possible to simply
+While it's possible to simply
 disable the B<READONLY> restriction and then change the value anyway, this
-will cause a massive action-at-a-distance behavior in the future, and we
-(and everyone we care about) will hate us forever for this.
+might cause action-at-a-distance behavior in the future, and we surely want
+to avoid such a risk.
 
 We do B<NOT> want to do this.
 
