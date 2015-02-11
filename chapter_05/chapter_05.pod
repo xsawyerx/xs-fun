@@ -1,0 +1,230 @@
+=head1 Chapter 05 - Context: here we come
+
+=head2 Let's put this in context
+
+The B<Chromaprint> library uses a context struct. It's a structure which
+is very similar to an object in the sense that it stores contextual
+information the way objects store attributes.
+
+In order to use B<Chromaprint> functions, we need to create a context and
+then call functions with that context. This is very similar to the Perl
+interface we would like to have, except we can use methods, so the object
+is already available.
+
+If the library was Perl, it would like this:
+
+    my $context   = Chromaprint->new(...);
+    my $algorithm = Chromaprint::algorithm($context);
+
+This is definitely not Perlish. We can make it fully object oriented by
+associating the Perl hash we create with the context object. We could
+then provide the following Perlish syntax:
+
+    my $chromaprint_object = Chromaprint->new(...);
+    my $algorithm          = $chromaprint_object->algorithm;
+
+Because the C<< -> >> notation sends the invocant as the first parameter,
+the object hash will be sent to our C<algorithm> function and we could
+match that with the context we will create ourselves.
+
+In order to do that, we need to do two things:
+
+=over 4
+
+=item * Create a context struct
+
+=item * Associate it with the Perl hash
+
+=back
+
+=head2 Creating the struct
+
+Creating the struct is fairly simple. Let's take a look at the C
+function signature:
+
+    CHROMAPRINT_API ChromaprintContext *chromaprint_new(int algorithm);
+
+The first part, C<CHROMAPRINT_API>, is a macro. The interesting part comes
+after.
+
+In order to create a chromaprint struct, we start by creating a pointer
+of type C<ChromaprintContext> and send the C<chromaprint_new> function
+the algorithm, as an C<int>.
+
+We can do that in XS too. First we can use the C<PREINIT> section to
+define a variable before our C<CODE> gets called.
+
+    PREEINIT:
+        ChromaprintContext *chromaprint_ctx;
+
+    CODE:
+        ...
+
+This provides us with a pointer of the right structure type. It doesn't
+point to anything yet.
+
+In order to make it point to something, we need to allocate memory to
+hold what the pointer will point to, point it there, and generate the
+structure.
+
+C is a bare-bones language and, although it has memory management
+functions, they are fairly simple. Big projects tend to add layers of
+logic on them to provide smarter allocation that fits better with the
+project's vision. Perl has its own version as well, which aims to
+pre-allocate space for variables that do not exist yet and reuse the
+allocated memory. This is why it is said that Perl favors performance to
+memory.
+
+C<Newx> can be used in order to allocate memory in Perl. You
+can also use C<malloc>, but C<Newx> is safer and smarter, and we should
+always remember the first chapter of optimization club.
+
+C<New> also exists, but it has been supersedes by the smarter C<Newx>.
+
+The function signature is:
+
+    void Newx(void* ptr, int nitems, type)
+
+This means we need to send a pointer, the number of items we would like
+to allocate memory for, and the type of value it will point to.
+
+    Newx( chromaprint_ctx, 1, ChromaprintContext );
+
+What this does is claim enough memory to contain at least one single
+C<ChromaprintContext> type of value and points C<chromaprint_ctx> to the
+allocated memory. (That memory segment still does not have a struct in it.)
+
+That's great. The last item is to simply create the struct in the
+location our pointer points at:
+
+    chromaprint_ctx = chromaprint_new(algo);
+
+You might notice two problems here. The first one would be, "Where is
+C<algo> from?" and the second, "What happens to the variable when we
+finish the C<new> method?"
+
+=head2 Algorithm
+
+Originally in our code, we had the algorithm option sent. We kept it in
+the hash the way it was sent, and we put C<test2> as the default value,
+but now we need to get smarter.
+
+Because the algorithm variable is an C<int> and we want to allow strings
+being sent, we will need to translate the string to the appropriate
+integer.
+
+First we create a default algorithm, and we will use a constant from
+the library to accomplish that:
+
+    int i, algo = CHROMAPRINT_ALGORITHM_DEFAULT;
+
+Now we loop over the items, just like we did before:
+
+    for ( i = 1; i < items; i += 2 ) {
+        SV *key   = ST(i);
+        SV *value = newSVsv( ST( i + 1 ) );
+
+And now we start checking if we received an algorithm, and if so, we
+overwrite the algorithm variable. If it's not an algorithm, we store it.
+
+        // we only store unless it's the algorithm
+        // then we simply override the value and store it later
+        if ( strcmp( SvPV_nolen( ST(i) ), "algorithm" ) == 0 ) {
+            const char *algo_v = SvPV_nolen(value);
+            // check algorithm options
+            if (!strcmp( algo_v, "test1")) {
+                algo = CHROMAPRINT_ALGORITHM_TEST1;
+            } else if (!strcmp(algo_v, "test2")) {
+                algo = CHROMAPRINT_ALGORITHM_TEST2;
+            } else if (!strcmp(algo_v, "test3")) {
+                algo = CHROMAPRINT_ALGORITHM_TEST3;
+            } else if (!strcmp(algo_v, "test4")) {
+                algo = CHROMAPRINT_ALGORITHM_TEST4;
+            } else {
+                fprintf(stderr, "WARNING: unknown algorithm, using the default\n");
+            }
+
+            algo = SvIV( ST( i + 1 ) );
+        } else {
+            hv_store_ent( hash, key, value, 0 );
+        }
+
+
+Why do we only overwrite the C<algo> variable instead of simply storing
+it? Imagine the following code:
+
+    my $chromaprint = Audio::Chromaprint->new();
+
+If we check the algorithm only within the loop of keys, we won't spot that
+one was not provided.
+
+Another approach is to store everything, no matter what, then check the
+value from the hash and change it if missing.
+
+We can also first create the hash with the default algorithm and then
+override if it's available in the options. That will force two writings
+to the hash instead of a single one.
+
+Since the algorithm is an integer and not a string, we correct the
+following statement:
+
+       hv_store(
+           hash,
+           "algorithm",
+           strlen("algorithm"),
+           newSViv(algo),
+           0
+       );
+
+Excellent!
+
+=head2 Knowing the context
+
+Now that we have the context, even when the function is done, it will
+still be in memory, but we won't have the pointer anymore. They pointer
+will go away but the context struct will live on. We need a way to be
+able to find it back.
+
+Since pointers are basically addresses, we can print out the address
+number.
+
+    printf("Context pointer address: %p\n", chromaprint_ctx);
+
+In the output we will get:
+
+    Context pointer address: 0x1a7c040
+
+This is hexadecimal but we can get the integer value of it, and we can
+save value in the hash we return to the user. Then when another method is
+called, it can fetch the pointer address from the hash value and call
+additional Chromaprint functions with it.
+
+    hv_store(
+        hash,
+        "_cp_str",
+        strlen("_cp_str"),
+        newSViv( PTR2IV(chromaprint_ctx) ),
+        0
+    );
+
+Let's try to print out the object we get from the XS C<new> method:
+
+    use DDP;
+    my $cp = Audio::Chromaprint->new();
+    p $cp;
+
+The output:
+
+    Audio::Chromaprint  {
+        public methods (4) : algorithm, bootstrap, new, version
+        private methods (0)
+        internals: {
+            algorithm   "test1",
+            _cp_ptr     27770944
+        }
+    }
+
+=head2 Filling in the testing gap
+
+We've added a few new things and they should be tested. The next chapter
+will cover testing what we have done in this chapter.
