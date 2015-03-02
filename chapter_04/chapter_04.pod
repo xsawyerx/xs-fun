@@ -417,7 +417,9 @@ we will get the following output:
       CUR = 5
       LEN = 16
 
-(This is the same output you will get with L<Devel::Peek>.)
+(This is the same output you will get with L<Devel::Peek>.) Note that this
+output was generated with Perl 5.14 and could differ slightly with the
+output from later Perl versions.
 
 You can see the B<FLAGS> entry has B<PADTMP> and B<READONLY>. This is
 because it's a temporary lexical variable and read-only.
