@@ -192,8 +192,3 @@ The output:
             _cp_ptr     27770944
         }
     }
-
-=head2 Filling in the testing gap
-
-We've added a few new things and they should be tested. The next chapter
-will cover testing what we have done in this chapter.
