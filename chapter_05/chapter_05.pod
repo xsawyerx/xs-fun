@@ -137,14 +137,13 @@ overwrite the algorithm variable. If it's not an algorithm, we store it.
             } else if (!strcmp(algo_v, "test4")) {
                 algo = CHROMAPRINT_ALGORITHM_TEST4;
             } else {
-                fprintf(stderr, "WARNING: unknown algorithm, using the default\n");
+                warn("WARNING: unknown algorithm, using the default");
             }
 
             algo = SvIV( ST( i + 1 ) );
         } else {
             hv_store_ent( hash, key, value, 0 );
         }
-
 
 Why do we only overwrite the C<algo> variable instead of simply storing
 it? Imagine the following code:

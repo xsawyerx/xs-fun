@@ -40,7 +40,7 @@ new( const char *class, ... )
                 } else if (!strcmp(algo_v, "test4")) {
                     algo = CHROMAPRINT_ALGORITHM_TEST4;
                 } else {
-                    fprintf(stderr, "WARNING: unknown algorithm, using the default\n");
+                    warn("WARNING: unknown algorithm, using the default");
                 }
 
                 algo = SvIV( ST( i + 1 ) );
