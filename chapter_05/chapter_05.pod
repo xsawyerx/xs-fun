@@ -67,13 +67,9 @@ In order to make it point to something, we need to allocate memory to
 hold what the pointer will point to, point it there, and generate the
 structure.
 
-C is a bare-bones language and, although it has memory management
-functions, they are fairly simple. Big projects tend to add layers of
-logic on them to provide smarter allocation that fits better with the
-project's vision. Perl has its own version as well, which aims to
-pre-allocate space for variables that do not exist yet and reuse the
-allocated memory. This is why it is said that Perl favors performance to
-memory.
+It is not uncommon for a project to maintain its own memory-management
+functions, and Perl has its own as well, which are optimized for speed
+and reuse.
 
 C<Newx> can be used in order to allocate memory in Perl. You
 can also use C<malloc>, but C<Newx> is safer and smarter, and we should
