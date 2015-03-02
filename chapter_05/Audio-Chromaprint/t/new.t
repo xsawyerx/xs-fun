@@ -4,7 +4,6 @@ use strict;
 use warnings;
 use Test::More tests => 9;
 use Test::Fatal;
-use Test::Warn;
 
 use_ok( 'Audio::Chromaprint' );
 
