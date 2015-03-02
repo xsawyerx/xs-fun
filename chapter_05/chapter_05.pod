@@ -63,35 +63,9 @@ define a variable before our C<CODE> gets called.
 This provides us with a pointer of the right structure type. It doesn't
 point to anything yet.
 
-In order to make it point to something, we need to allocate memory to
-hold what the pointer will point to, point it there, and generate the
-structure.
-
-It is not uncommon for a project to maintain its own memory-management
-functions, and Perl has its own as well, which are optimized for speed
-and reuse.
-
-C<Newx> can be used in order to allocate memory in Perl. You
-can also use C<malloc>, but C<Newx> is safer and smarter, and we should
-always remember the first chapter of optimization club.
-
-C<New> also exists, but it has been supersedes by the smarter C<Newx>.
-
-The function signature is:
-
-    void Newx(void* ptr, int nitems, type)
-
-This means we need to send a pointer, the number of items we would like
-to allocate memory for, and the type of value it will point to.
-
-    Newx( chromaprint_ctx, 1, ChromaprintContext );
-
-What this does is claim enough memory to contain at least one single
-C<ChromaprintContext> type of value and points C<chromaprint_ctx> to the
-allocated memory. (That memory segment still does not have a struct in it.)
-
-That's great. The last item is to simply create the struct in the
-location our pointer points at:
+In order to make it point to something, we need to create a new struct
+for the chromaprint. We can use the C<chromaprint_new> function provided
+by the Chromaprint library.
 
     chromaprint_ctx = chromaprint_new(algo);
 

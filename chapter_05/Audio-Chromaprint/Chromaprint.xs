@@ -58,10 +58,7 @@ new( const char *class, ... )
             0
         );
 
-        Newx( chromaprint_ctx, 1, ChromaprintContext );
-
-        // fill chromaprint_ctx with some value
-        // (it was initialized to the right type and we have the algo)
+        // print chromaprint_xtx to a new chromaprint object
         chromaprint_ctx = chromaprint_new(algo);
 
         // store the pointer to the chromaprint object in the hash
