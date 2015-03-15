@@ -1,0 +1,252 @@
+=head1 Chapter 06 - Tightening up
+
+=head2 A few loose ends
+
+There are two glaring loose ends in the previous chapter. You might have
+noticed them yourself.
+
+First of all, we don't clean up the pointer we created. We create a struct
+and point to it, but we never actually cleaned that up. We will need to
+introduce a C<DESTROY> method. We should probably also test everything.
+
+Secondly, we should expose the algorithm method so our users don't have to
+dig into the object as a hash, thus breaking encapsulation.
+
+Lastly, there is a constructor parameter which we haven't used that the
+user can set in the API. We should support that.
+
+=head2 The destructor
+
+Once we create a struct, we are in charge of cleaning it up. Perl won't
+do that for us - at least not in this case. However, Perl can help us by
+calling a function for us when we should be cleaning up the struct.
+That's the C<DESTROY> method and Perl calls it when it cleans up a
+variable. In this case the variable will be the object we create.
+
+In order to cleanup our struct, we can simply implement C<DESTROY>.
+
+We'll start by defining the method:
+
+    void
+    DESTROY(SV *self)
+
+Now we can use the B<PREINIT> section to define variables, which is less
+error-prone than defining them in the B<CODE> section.
+
+        PREINIT:
+            ChromaprintContext *ctx;
+            HV *hash;
+
+Now, finally the B<CODE> section. We will need to dereference the hash
+and then point the pointer to the address where we created the Chromaprint
+context variable that the blessed hashref we use as an object has in its
+hash key under an IV. Wow, that's a mouthful.
+
+Basically we take the object (which is a hashref), dig inside it for the
+proper key where we stored the pointer address, and use is to point the
+new pointer to.
+
+        CODE:
+            hash = (HV *)SvRV(self);
+            ctx  = (ChromaprintContext *) SvIV(
+                       *hv_fetch( hash, "_cp_ptr", strlen("_cp_str"), FALSE )
+                   );
+
+You might notice we're using C<FALSE> instead of C<0> here, as it has a
+clearer boolean usage here.
+
+Now, since we instantiated the struct using Chromaprint, we will also free
+it using it:
+
+            chromaprint_free(ctx);
+
+That's it. Altogether, the C<DESTROY> method is simply this:
+
+void
+DESTROY(SV *self)
+    PREINIT:
+        ChromaprintContext *ctx;
+        HV *hash;
+
+    CODE:
+        hash = (HV *)SvRV(self);
+        ctx  = (ChromaprintContext *) SvIV(
+                   *hv_fetch( hash, "_cp_ptr", strlen("_cp_str"), FALSE )
+               );
+        chromaprint_free(ctx);
+ 
+
+We can also write a simple test for it:
+
+    use strict;
+    use warnings;
+    use Test::More tests => 2;
+    use Test::MemoryGrowth;
+
+    use_ok( 'Audio::Chromaprint' );
+    no_growth { Audio::Chromaprint->new; } 'Does not grow in memory';
+
+Simple as that.
+
+Except... we do have a test already in which we're defining the C<DESTROY>
+method, which means we'll get a warning that we're redefining it (once in
+the XS code, and once in the test).
+
+We can fix that by creating a new class which will subclass the original
+one, and create its own DESTROY. After using it to check for circular
+referencing, we can call the original C<DESTROY> method:
+
+    use strict;
+    use warnings;
+    use Test::More tests => 2;
+
+    use_ok( 'Audio::Chromaprint' );
+
+    my $called = 0;
+    package My::Audio::Chromaprint {
+        use parent 'Audio::Chromaprint';
+        sub DESTROY {
+            $called++;
+            my $self = shift;
+            $self->SUPER::DESTROY(@_);
+        }
+    }
+
+    {
+        my $cp = My::Audio::Chromaprint->new;
+    }
+
+    cmp_ok( $called, '==', 1, 'Destruction successful' );
+
+Here we are using C<SUPER::DESTROY> to call the C<DESTROY> method of our
+parent class.
+
+=head2 Algorithm from context
+
+Considering Chromaprint has a function declared called
+C<chromaprint_get_algorithm>, writing a method which calls it would be
+simple. We just need to use the same trick of having a new pointer point
+to the context we had already created - the one we used in the C<DESTROY>
+method above:
+
+    SV *
+    algorithm(SV *self)
+        PREINIT:
+            ChromaprintContext *ctx;
+            HV *hash;
+        CODE:
+            hash = (HV *)SvRV(self);
+            ctx  = (ChromaprintContext *) SvIV(
+                       *hv_fetch( hash, "_cp_ptr", strlen("_cp_str"), FALSE )
+                   );
+            RETVAL = chromaprint_get_algorithm(ctx);
+        OUTPUT: RETVAL
+
+This compiles alright, but if we try to run it, uh oh! Look at this
+output:
+
+    t/version.t ....... 1/4
+    #   Failed test 'use Audio::Chromaprint;'
+    #   at t/version.t line 7.
+    #     Tried to use 'Audio::Chromaprint'.
+    #     Error:  Can't load '.../Chromaprint.so' for module Audio::Chromaprint: .../Chromaprint.so: undefined symbol: chromaprint_get_algorithm at /usr/lib/perl/5.18/DynaLoader.pm line 184.
+    #  at t/version.t line 7.
+    # Compilation failed in require at t/version.t line 7.
+    # BEGIN failed--compilation aborted at t/version.t line 7.
+    Can't locate object method "new" via package "Audio::Chromaprint" at t/version.t line 9.
+
+I<(and this is the cleaned output...)>
+
+The problem appears at the end of the I<Can't load> line. It says
+I<undefined symbol: chromaprint_get_algorithm>. I'll admit this took
+baffled me personally quite a bit, until I ran the following command, to
+see all the defined symbols:
+
+    $ readelf -Ws  /usr/lib/x86_64-linux-gnu/libchromaprint.so.0.2.2  | grep chromaprint
+
+The output of this command showed a few functions, but
+C<chromaprint_get_algorithm> was not one of them. So no longer baffled,
+I was now definitely confused.
+
+Thankfully Mattia Barbon came to my help:
+I<"The function is not implemented">, he simply said. Without checking
+thoroughly, I had noticed the function definition in the header file, but
+the function, however, doesn't actually exist - its implementation.
+
+This results in compilation working, linking working, but eventually
+calling the function (which happened in that test) failing.
+
+Okay, so we can't use this function, but we can still provide a method of
+our own to access the hash key. That's the basic way of doing it in Perl,
+so let's do that.
+
+The way we will do this is very simple: We fetch from the object the
+key value, and we serve to the user an B<SV> representing that value. We
+can't serve the B<SV> itself, we need to create our own. Then we'll add
+checks which we pretty much ignored up until now.
+
+First our B<PREINIT> block will define the variables: the key as a string
+so we don't have to repeat it (no need for a defined constant yet) and a
+pointer to an B<SV> pointer, because that's what the C<hv_fetch> function
+we will use returns:
+
+    SV *
+    algorithm(SV *self)
+        PREINIT:
+            const char *key = "algorithm";
+            SV **svp;
+
+Now the code, at first, simply fetches and returns a new B<SV> based
+on what we got back from C<hv_fetch>.
+
+        CODE:
+            svp = hv_fetch( (HV *)SvRV(self), key, strlen(key), FALSE );
+            RETVAL = newSVsv(*svp);
+
+        OUTPUT: RETVAL
+
+Now the checks. What if we didn't get a reference as a parameter? What
+if we didn't get a good value back from the hash key?
+
+We'll start by setting the B<RETVAL> to an undef. That way, we either
+return a good value or undef. Then we check whether we got a reference
+or not, and we also check the value we got back for a proper B<SV>.
+
+        CODE:
+            RETVAL = &PL_sv_undef;
+
+            if ( !SvROK(self) )
+                croak("type parameter is not a reference");
+
+            svp = hv_fetch( (HV *)SvRV(self), key, strlen(key), FALSE );
+
+            if ( svp && SvOK(*svp) )
+                RETVAL = newSVsv(*svp);
+
+Done!
+
+=head2 Compeleting the constructor
+
+Last loose end is the options you can send to the Chromaprint constructor.
+We currently don't send anything, although it is possible. Right now it
+seems the only option is the I<silence threshold>. We can add this piece
+of code in our constructor after we create a new Chromaprint context:
+
+    const char *s_threshold = "silence_threshold";
+    if ( hv_exists( hash, s_threshold, strlen(s_threshold) ) ) {
+        SV **s_threshold_val = hv_fetch( hash, s_threshold, strlen(s_threshold), FALSE );
+        chromaprint_set_option(
+            chromaprint_ctx,
+            s_threshold,
+            SvIV( *s_threshold_val )
+        );
+    }
+
+
+Simple.
+
+=head2 Mapping our types
+
+The next chapter in our journey will be B<typemaps>, which are ways for
+us to tell Perl's XS compiler how to automatically map types, so we don't
+have to handle all the conversion in our code.
