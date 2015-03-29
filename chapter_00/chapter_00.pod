@@ -68,8 +68,8 @@ Create it in the top-level directory with the following command:
 
 Or on Windows cmd.exe with Strawberry Perl:
 
-	perl -MDevel::PPPort -E"Devel::PPPort::WriteFile"
-	
+    perl -MDevel::PPPort -E"Devel::PPPort::WriteFile"
+
 =head3 XSFun.xs
 
 The XS file contains both XS code and possibly valid C code. At first we
