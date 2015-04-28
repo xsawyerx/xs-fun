@@ -54,13 +54,13 @@ use_ok( 'Audio::Chromaprint' );
 
 {
     my $cp = Audio::Chromaprint->new(
-        algorithm => 3,
+        algorithm => 'test3',
     );
 
     isa_ok( $cp, 'Audio::Chromaprint' );
     is(
         $cp->algorithm,
-        3,
+        2,
         'Constructor set correct algorithm from argument',
     );
 }

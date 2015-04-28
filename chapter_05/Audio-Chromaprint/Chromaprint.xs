@@ -42,8 +42,6 @@ new( const char *class, ... )
                 } else {
                     warn("WARNING: unknown algorithm, using the default");
                 }
-
-                algo = SvIV( ST( i + 1 ) );
             } else {
                 hv_store_ent( hash, key, value, 0 );
             }
