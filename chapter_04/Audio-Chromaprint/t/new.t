@@ -17,7 +17,7 @@ use_ok( 'Audio::Chromaprint' );
     like(
         exception { Audio::Chromaprint->new( 1, 2, 3 ) },
         qr{^Expecting key/value pairs as input to constructor},
-        'Incorrect input for odd items (instead of pairs(',
+        'Incorrect input for odd items (instead of pairs)',
     );
 
     is(
