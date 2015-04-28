@@ -58,7 +58,7 @@ new( const char *class, ... )
             FALSE
         );
 
-        // print chromaprint_xtx to a new chromaprint object
+        // print chromaprint_ctx to a new chromaprint object
         chromaprint_ctx = chromaprint_new(algo);
 
         // set all variables in the chromaprint object
