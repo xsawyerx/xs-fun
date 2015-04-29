@@ -1,0 +1,92 @@
+=head1 Chapter 07 - Proper struct structure
+
+Before we can begin working with a typemap, we want to have a proper
+structure that holds all the relevant information for us.
+
+If, for example, we want to store the algorithm, it would make more sense
+to store it behind the scenes and then present it. If we want to hold on
+to the Chromaprint context variable, have it stored in the same structure
+with the algorithm make sense.
+
+Having a proper structure (using a C<struct>) allows us to maintain our
+own context containing all we need to represent the Chromaprint context,
+and to add new abilities that do not exist in the Chromaprint context
+without pushing it into the hash - a place that is too visible for the
+user and can be changed.
+
+=head2 The struct
+
+Let's start by defining our struct:
+
+    typedef struct {
+        int                 algorithm;
+        ChromaprintContext* cp_ctx;
+    } CTX;
+
+
+This struct, which we named B<CTX> contains both the algorithm and the
+Chromaprint context.
+
+=head2 Using it
+
+We can use it in our XS code. First we declare it and allocate enough
+memory to store in it:
+
+    PREINIT:
+        CTX* ctx = (CTX *)malloc( sizeof(ctx) );
+
+Now we use it to store both the Chromaprint context and the algorithm:
+
+    ctx->cp_ctx    = chromaprint_new(algo);
+    ctx->algorithm = algo;
+
+And then we adjust everything that uses it.
+
+=over 4
+
+=item * When setting options
+
+    chromaprint_set_option(
+        ctx->cp_ctx,
+        s_threshold,
+        SvIV( *s_threshold_val )
+    );
+
+=item * When storing a pointer in the hash
+
+    hv_store(
+        hash,
+        "_cp_str",
+        strlen("_cp_str"),
+        newSViv( PTR2IV(ctx) ),
+        FALSE
+    );
+
+=item * Algorithm method
+
+The algorithm method should now revive the struct using the pointer address
+saved in the hash and retrieve the algorithm from that struct:
+
+    ...
+    svp = hv_fetch(...)
+
+    if ( svp && SvOK(*svp) ) {
+        ctx = (CTX *) SvIV(*svp);
+        RETVAL = newSViv( ctx->algorithm );
+    }
+
+    OUTPUT: RETVAL
+
+=item * DESTROY method
+
+And of course, when freeing the memory, we now have two structs to clear:
+
+    svp = hv_fetch( hash, "_cp_ptr", strlen("_cp_ptr"), FALSE );
+
+    if ( svp && SvOK(*svp) ) {
+        ctx = (CTX *) SvIV(*svp);
+        chromaprint_free( ctx->cp_ctx );
+        free(ctx);
+    }
+
+=back
