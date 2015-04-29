@@ -49,7 +49,7 @@ new pointer to.
         CODE:
             hash = (HV *)SvRV(self);
             ctx  = (ChromaprintContext *) SvIV(
-                       *hv_fetch( hash, "_cp_ptr", strlen("_cp_str"), FALSE )
+                       *hv_fetchs( hash, "_cp_ptr", FALSE )
                    );
 
 You might notice we're using C<FALSE> instead of C<0> here, as it has a
@@ -71,7 +71,7 @@ DESTROY(SV *self)
     CODE:
         hash = (HV *)SvRV(self);
         ctx  = (ChromaprintContext *) SvIV(
-                   *hv_fetch( hash, "_cp_ptr", strlen("_cp_str"), FALSE )
+                   *hv_fetchs( hash, "_cp_ptr", FALSE )
                );
         chromaprint_free(ctx);
  
@@ -137,7 +137,7 @@ method above:
         CODE:
             hash = (HV *)SvRV(self);
             ctx  = (ChromaprintContext *) SvIV(
-                       *hv_fetch( hash, "_cp_ptr", strlen("_cp_str"), FALSE )
+                       *hv_fetchs( hash, "_cp_ptr", FALSE )
                    );
             RETVAL = chromaprint_get_algorithm(ctx);
         OUTPUT: RETVAL

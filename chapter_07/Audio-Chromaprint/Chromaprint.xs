@@ -118,7 +118,7 @@ DESTROY(SV *self)
 
     CODE:
         hash = (HV *)SvRV(self);
-        svp  = hv_fetch( hash, "_cp_ptr", strlen("_cp_str"), FALSE );
+        svp  = hv_fetchs( hash, "_cp_ptr", FALSE );
 
         if ( svp && SvOK(*svp) ) {
             ctx = (CTX *) SvIV(*svp);

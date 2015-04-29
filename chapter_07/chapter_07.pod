@@ -81,7 +81,7 @@ saved in the hash and retrieve the algorithm from that struct:
 
 And of course, when freeing the memory, we now have two structs to clear:
 
-    svp = hv_fetch( hash, "_cp_ptr", strlen("_cp_ptr"), FALSE );
+    svp = hv_fetchs( hash, "_cp_ptr", FALSE );
 
     if ( svp && SvOK(*svp) ) {
         ctx = (CTX *) SvIV(*svp);

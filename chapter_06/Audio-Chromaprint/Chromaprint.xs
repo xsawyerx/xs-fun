@@ -119,7 +119,7 @@ DESTROY(SV *self)
     CODE:
         hash = (HV *)SvRV(self);
         ctx  = (ChromaprintContext *) SvIV(
-                   *hv_fetch( hash, "_cp_ptr", strlen("_cp_str"), FALSE )
+                   *hv_fetchs( hash, "_cp_ptr", FALSE )
                );
 
         chromaprint_free(ctx);
