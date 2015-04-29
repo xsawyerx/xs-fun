@@ -33,7 +33,7 @@ We can use it in our XS code. First we declare it and allocate enough
 memory to store in it:
 
     PREINIT:
-        CTX* ctx = (CTX *)malloc( sizeof(ctx) );
+        CTX* ctx = (CTX *)malloc( sizeof(CTX) );
 
 Now we use it to store both the Chromaprint context and the algorithm:
 

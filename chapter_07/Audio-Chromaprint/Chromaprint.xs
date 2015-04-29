@@ -18,7 +18,7 @@ PROTOTYPES: ENABLED
 SV *
 new( const char *class, ... )
     PREINIT:
-        CTX* ctx = (CTX *)malloc( sizeof(ctx) );
+        CTX* ctx = (CTX *)malloc( sizeof(CTX) );
 
     CODE:
         if ( ( items - 1 ) % 2 )
