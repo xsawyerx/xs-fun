@@ -1,0 +1,135 @@
+=head1 Chapter 08 - Mapping types
+
+XSUBs (XS functions) receive and return Perl's C data types (B<SV>, B<IV>,
+B<AV>, B<HV>, and so forth). If we want to return an B<int>, we will need
+to create an IV with the value and retun it. If we want to receive an
+B<int> we will need to translate an B<int> back to an B<SV>.
+
+Perl's XS layer provides a comfortable way to indicate how to translate
+these types (and any other you want) and have Perl's XS preprocessor
+add the translation code for you. B<TYPEMAP>s are the mechanism XS uses
+to automatically translate different data types.
+
+You can create your own or use the default ones that Perl provides out
+of the box. In fact, we're using those already in our code.
+
+You can read about typemaps in L<perlxstypemap>.
+
+We will use a typemap to convert our context structure to a Perl variable
+and back.
+
+=head2 Basic structs
+
+Once we have a struct, Perl has a basic typemap for translating a struct
+into a reference. This will allow us to automatically receive a reference
+from C<new> when C<new>'s XS code simply returns a pointer to our new
+struct.
+
+There is one big caveat, as we will see.
+
+=head2 The typemap file
+
+First, we create a F<typemap> file. Perl has a default type called
+B<T_PTROBJ>. The documentation is as follows:
+
+    The pointer is blessed into a class that is derived from the name
+    of type of the pointer but with all '*' in the name replaced with
+    'Ptr'.
+
+This means that we need to provide B<T_PTROBJ> with a package name. If we
+had any asterisks in the typemap definition, it would replace the asterisks
+with the string C<Ptr>. This means that if we had the line:
+
+    SomeClass *     T_PTROBJ
+
+It will bless the pointer to the package C<SomeClassPtr>.
+
+Now we need to adjust the XS layer. The tests will be the really awkward
+part.
+
+=head2 Adjust the XS part
+
+In order to return the context struct, we need to delete the code that
+creates the hash reference we have (you might begin to see the caveat),
+so we delete the following chunks of code:
+
+    // store the pointer to the chromaprint object in the hash
+    // user plays with it, it breaks
+    hv_store(
+        hash,
+        "_cp_ptr",
+        strlen("_cp_ptr"),
+        newSViv( PTR2IV(ctx) ),
+        FALSE
+    );
+
+    SV* const self = newRV_noinc( (SV *)hash );
+
+    RETVAL = sv_bless( self, gv_stashpv( class, 0 ) );
+
+Instead, we change the C<RETVAL> to just return the context:
+
+    RETVAL = ctx
+
+We also need to make sure we return a C<Audio::Chromaprint> variable.
+We change the XS function's beginning to:
+
+    Audio::Chromaprint
+    new( const char *class, ... )
+
+Perl will do something quite interesting here. Let's print out what we
+got back using L<Devel::Peek>:
+
+    SV = IV(0xd0f640) at 0xd0f650
+      REFCNT = 1
+      FLAGS = (PADMY,ROK)
+      RV = 0xc3b0f8
+      SV = PVMG(0xde75d0) at 0xc3b0f8
+        REFCNT = 1
+        FLAGS = (OBJECT,IOK,pIOK)
+        IV = 14770176
+        NV = 0
+        PV = 0
+        STASH = 0xe3b368    "Audio::Chromaprint"
+
+I<(This might look a bit different, depending on your version of the Perl
+interpreter.)>
+
+We have an B<IV> which is an B<RV>, which references an B<PVMG>, which has
+an B<IV> slot with a value, and a B<STASH> defined with the package.
+
+Translating this to Perl, we end up with a scalar reference, blessed into
+the B<Audio::Chromaprint> package. The scalar value is the pointer address
+for our C-level C<ctx> struct pointer.
+
+Now we see the full caveat: We don't have a hash reference back, we only
+have a scalar reference back. Moreover, we have the pointer address as a
+value of the scalar, which means someone can change it if they want.
+
+=head2 Testing
+
+If we try our memory leak test right now, it will not work as expected.
+The typemap blesses into the package C<Audio::Chromaprint>, while our
+test has an object based on it instead. This means that our C<DESTROY>
+method will not be called - only the C<DESTROY> of C<Audio::Chromaprint>.
+
+A way to fix it is to override the original method in the right package,
+and use that to increment the counter, to know that it was called.
+
+The following should be our test:
+
+    my $called = 0;
+    {
+        no warnings qw<redefine once>;
+        *Audio::Chromaprint::DESTROY = sub ($) {
+            $called++;
+            my $self = shift;
+        };
+    }
+
+    {
+        my $cp = Audio::Chromaprint->new;
+    }
+
+You will notice we have a prototype on the C<DESTROY> method - that is
+because the XS version has a prototype too.
