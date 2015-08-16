@@ -18,7 +18,7 @@ Ground rules
 These are the best bits of advice I've received so far and they've proven
 to be crucial.
 
-`h2xs` is old and crufty, and thusfar seems more like a hurdle. Instead,
+`h2xs` is old and crufty, and thus far seems more like a hurdle. Instead,
 this guide includes a skeleton for each exercise that you can copy and use
 each time you start a new project.
 
@@ -53,4 +53,3 @@ More advanced or specialized resources
 * [perlinterp](http://perldoc.perl.org/perlinterp.html) (`perldoc perlinterp`)
 * [perlcall](http://perldoc.perl.org/perlcall.html) (`perldoc perlcall`)
 * [perlsource](http://perldoc/perl.org/perlsource.html) (`perldoc perlsource`)
-
