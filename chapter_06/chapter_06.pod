@@ -225,7 +225,7 @@ or not, and we also check the value we got back for a proper B<SV>.
 
 Done!
 
-=head2 Compeleting the constructor
+=head2 Completing the constructor
 
 Last loose end is the options you can send to the Chromaprint constructor.
 We currently don't send anything, although it is possible. Right now it

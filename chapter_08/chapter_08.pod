@@ -2,7 +2,7 @@
 
 XSUBs (XS functions) receive and return Perl's C data types (B<SV>, B<IV>,
 B<AV>, B<HV>, and so forth). If we want to return an B<int>, we will need
-to create an IV with the value and retun it. If we want to receive an
+to create an IV with the value and return it. If we want to receive an
 B<int> we will need to translate an B<int> back to an B<SV>.
 
 Perl's XS layer provides a comfortable way to indicate how to translate

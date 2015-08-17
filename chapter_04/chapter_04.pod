@@ -478,7 +478,7 @@ C<SV>.
 
 The call to C<SvREFCNT_inc> is no longer necessary.
 
-To ensure that this code behaves the way we indend it to, we add the
+To ensure that this code behaves the way we intend it to, we add the
 following two tests after the C<Constructor set correct algorithm from
 argument> test:
 
