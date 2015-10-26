@@ -162,7 +162,7 @@ I<undefined symbol: chromaprint_get_algorithm>. I'll admit this took
 baffled me personally quite a bit, until I ran the following command, to
 see all the defined symbols:
 
-    $ readelf -Ws  /usr/lib/x86_64-linux-gnu/libchromaprint.so.0.2.2  | grep chromaprint
+    $ readelf -Ws  /usr/lib/x86_64-linux-gnu/libchromaprint.so.0.2.3  | grep chromaprint
 
 The output of this command showed a few functions, but
 C<chromaprint_get_algorithm> was not one of them. So no longer baffled,

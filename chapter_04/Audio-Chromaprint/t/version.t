@@ -10,5 +10,5 @@ my $cp = Audio::Chromaprint->new();
 isa_ok( $cp, 'Audio::Chromaprint' );
 can_ok( $cp, 'version'            );
 
-is( $cp->version, '1.1.0', 'chromaprint version is 1.1.0' );
+is( $cp->version, '1.2.0', 'chromaprint version is 1.2.0' );
 
