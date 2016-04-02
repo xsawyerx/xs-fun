@@ -29,7 +29,7 @@ this library installed" problem is to provide an `Alien` package. This guide
 might go over it at some point but makes no promises.
 
 Eliminating the use of `h2xs` and bundling any C libraries we use (that
-we haven't wrote by ourselves) remove a lot of needless complexity.
+we haven't written by ourselves) removes a lot of needless complexity.
 
 Perl 5.14.2 is prevalent enough to consider it a starting ground, though at
 this point it is not yet necessarily important.
