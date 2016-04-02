@@ -1,3 +1,4 @@
 *.swp
 chromaprint/
 build/pdf
+build/chapters
