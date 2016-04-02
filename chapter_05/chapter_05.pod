@@ -1,4 +1,4 @@
-=head1 Chapter 05 - Context: here we come
+=head1 Context: here we come
 
 =head2 Let's put this in context
 

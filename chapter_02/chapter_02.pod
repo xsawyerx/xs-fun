@@ -1,4 +1,4 @@
-=head1 Chapter 02 - Basic External Library Functions
+=head1 Basic External Library Functions
 
 =head2 Compiling against a library
 

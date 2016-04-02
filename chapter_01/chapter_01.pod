@@ -1,4 +1,4 @@
-=head1 Chapter 01 - Basic XS
+=head1 Basic XS
 
 =head2 Basic Functions
 

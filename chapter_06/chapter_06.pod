@@ -1,4 +1,4 @@
-=head1 Chapter 06 - Tightening up
+=head1 Tightening up
 
 =head2 A few loose ends
 

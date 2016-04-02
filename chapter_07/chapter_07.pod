@@ -1,4 +1,4 @@
-=head1 Chapter 07 - Proper struct structure
+=head1 Proper struct structure
 
 Before we can begin working with a typemap, we want to have a proper
 structure that holds all the relevant information for us.

@@ -1,4 +1,4 @@
-=head1 Chapter 08 - Mapping types
+=head1 Mapping types
 
 XSUBs (XS functions) receive and return Perl's C data types (B<SV>, B<IV>,
 B<AV>, B<HV>, and so forth). If we want to return an B<int>, we will need
