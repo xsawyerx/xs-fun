@@ -89,7 +89,7 @@ Now let's run the tests:
 You can also run the following command to clean up your directory:
 
     make distclean
-	
+
 (if you're using Strawberry Perl on Windows, use C<dmake> instead of C<make>)
 
 I<Why use C<Test::More::is> instead of C<Test::More::cmp_ok>?>
