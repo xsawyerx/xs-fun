@@ -1,4 +1,4 @@
-=head1 Preparing the Skeleton
+=head1 Preparing the skeleton
 
 =head2 A Good Start
 

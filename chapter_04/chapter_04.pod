@@ -1,4 +1,4 @@
-=head1 Better Construction
+=head1 Better construction
 
 =head2 What's in a constructor?
 

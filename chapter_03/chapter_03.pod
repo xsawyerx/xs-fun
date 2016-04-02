@@ -1,4 +1,4 @@
-=head1 Enter Object Oriented
+=head1 Enter object oriented
 
 =head2 Introduction
 
