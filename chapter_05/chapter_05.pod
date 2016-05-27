@@ -54,7 +54,7 @@ the algorithm, as an C<int>.
 We can do that in XS too. First we can use the C<PREINIT> section to
 define a variable before our C<CODE> gets called.
 
-    PREEINIT:
+    PREINIT:
         ChromaprintContext *chromaprint_ctx;
 
     CODE:
