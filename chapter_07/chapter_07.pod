@@ -56,8 +56,8 @@ And then we adjust everything that uses it.
 
     hv_store(
         hash,
-        "_cp_str",
-        strlen("_cp_str"),
+        "_cp_ptr",
+        strlen("_cp_ptr"),
         newSViv( PTR2IV(ctx) ),
         FALSE
     );
