@@ -10,6 +10,7 @@ WriteMakefile(
     DEFINE         => '',
     INC            => '-I.',
     OBJECT         => '$(O_FILES)',
+    LICENSE        => 'perl', # or your choice
     META_MERGE     => {
         resources => {
             repository => {
