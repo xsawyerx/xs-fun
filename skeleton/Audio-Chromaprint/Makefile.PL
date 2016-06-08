@@ -11,4 +11,3 @@ WriteMakefile(
     INC            => '-I.',
     OBJECT         => '$(O_FILES)',
 );
-

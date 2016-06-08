@@ -11,4 +11,3 @@ WriteMakefile(
     INC            => '-I.',        # e.g., '-I. -I/usr/include/other'
     OBJECT         => '$(O_FILES)', # link all the C files too
 );
-
