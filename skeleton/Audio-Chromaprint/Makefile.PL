@@ -22,4 +22,3 @@ WriteMakefile(
         'meta-spec' => { version => 2 },
       },
 );
-
