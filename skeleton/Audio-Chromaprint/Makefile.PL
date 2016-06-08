@@ -1,4 +1,4 @@
-use 5.008005;
+use 5.006000;
 use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME           => 'Audio::Chromaprint',
