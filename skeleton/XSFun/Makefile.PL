@@ -10,4 +10,14 @@ WriteMakefile(
     DEFINE         => '',           # e.g., '-DHAVE_SOMETHING'
     INC            => '-I.',        # e.g., '-I. -I/usr/include/other'
     OBJECT         => '$(O_FILES)', # link all the C files too
+    META_MERGE     => {
+        resources => {
+            repository => {
+                type => 'git',
+                url  => 'git@github.com:your-github-username/p5-XSFun.git',
+                web  => 'https://github.com/your-github-username/p5-XSFun',
+            },
+        },
+        'meta-spec' => { version => 2 },
+      },
 );
