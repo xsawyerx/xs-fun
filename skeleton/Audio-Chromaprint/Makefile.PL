@@ -7,9 +7,10 @@ WriteMakefile(
     ABSTRACT_FROM  => 'lib/Audio/Chromaprint.pm',
     AUTHOR         => 'You',
     LIBS           => ['-lchromaprint'],
-    DEFINE         => '',
-    INC            => '-I.',
-    OBJECT         => '$(O_FILES)',
+    DEFINE         => '',           # e.g., '-DHAVE_SOMETHING'
+    INC            => '-I.',        # e.g., '-I. -I/usr/include/other'
+    OBJECT         => '$(O_FILES)', # link all the C files too
+    LICENSE        => 'perl',       # or your choice
     META_MERGE     => {
         resources => {
             repository => {
