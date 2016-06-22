@@ -115,7 +115,7 @@ a new value in the hash we created in the previous chapter. Let's add it:
             RETVAL = sv_bless( self, gv_stashpv( class, 0 ) );
         OUTPUT: RETVAL
 
-=head2 Ru-run tests
+=head2 Re-run tests
 
     $ make && make test TEST_VERBOSE=1 TEST_FILES="t/new.t"
 
