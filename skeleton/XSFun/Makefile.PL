@@ -1,4 +1,4 @@
-use 5.008005;
+use 5.006000;
 use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME           => 'XSFun',
@@ -10,5 +10,15 @@ WriteMakefile(
     DEFINE         => '',           # e.g., '-DHAVE_SOMETHING'
     INC            => '-I.',        # e.g., '-I. -I/usr/include/other'
     OBJECT         => '$(O_FILES)', # link all the C files too
+    LICENSE        => 'perl',       # or your choice
+    META_MERGE     => {
+        resources => {
+            repository => {
+                type => 'git',
+                url  => 'git@github.com:you/p5-XSFun.git',
+                web  => 'https://github.com/you/p5-XSFun',
+            },
+        },
+        'meta-spec' => { version => 2 },
+      },
 );
-
