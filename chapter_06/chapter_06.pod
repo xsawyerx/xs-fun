@@ -62,8 +62,8 @@ it using it:
 
 That's it. Altogether, the C<DESTROY> method is simply this:
 
-void
-DESTROY(SV *self)
+    void
+    DESTROY(SV *self)
     PREINIT:
         ChromaprintContext *ctx;
         HV *hash;
