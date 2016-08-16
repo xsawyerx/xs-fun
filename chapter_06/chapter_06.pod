@@ -74,7 +74,6 @@ That's it. Altogether, the C<DESTROY> method is simply this:
                    *hv_fetchs( hash, "_cp_ptr", FALSE )
                );
         chromaprint_free(ctx);
- 
 
 We can also write a simple test for it:
 
