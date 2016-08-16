@@ -1,4 +1,12 @@
+*.bs
+*.c
+*.o
+*.old
 *.swp
-chromaprint/
+MYMETA.*
+pm_to_blib
+blib/
 build/pdf
 build/chapters
+chapter_*/*/Makefile
+chromaprint/
