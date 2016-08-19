@@ -113,9 +113,8 @@ overwrite the algorithm variable. If it's not an algorithm, we store it.
             } else {
                 warn("WARNING: unknown algorithm, using the default");
             }
-
-            algo = SvIV( ST( i + 1 ) );
         } else {
+            // no validation necessary here, just store it.
             hv_store_ent( hash, key, value, 0 );
         }
 
