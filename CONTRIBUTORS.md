@@ -3,7 +3,7 @@
 The following people have provided patches or otherwise contributed to
 xs-fun (listed in alphabetical order):
 
- - bulk88
+ - Bulk88
  - Mattia Barbon
  - Paul Cochrane
  - Gideon Israel Dsouza
