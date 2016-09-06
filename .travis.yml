@@ -16,7 +16,7 @@ install:
     - sudo apt-get install libboost-dev libavcodec-dev libavformat-dev libgtest-dev
     - cmake . && make && sudo make install
     - cd ..
-    - cpanm --notest Pod::Checker Test::MemoryGrowth
+    - cpanm --notest Pod::Checker Test::MemoryGrowth Test::Fatal
 
 script:
     - make test
