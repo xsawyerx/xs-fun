@@ -10,7 +10,12 @@ perl:
     - "5.14"
 
 install:
-    - sudo apt-get install libchromaprint-dev
+    - wget https://bitbucket.org/acoustid/chromaprint/downloads/chromaprint-1.2.tar.gz
+    - tar -xvzf chromaprint-1.2.tar.gz
+    - cd chromaprint-1.2
+    - sudo apt-get install libboost-dev libavcodec-dev libavformat-dev libgtest-dev
+    - cmake . && make && sudo make install
+    - cd ..
     - cpanm --notest Pod::Checker Test::MemoryGrowth
 
 script:
