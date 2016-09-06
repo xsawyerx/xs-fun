@@ -11,7 +11,7 @@ for it, the headers and sources.
 
 If you're on GNU/Linux you probably have the library in your distribution
 resources. If you're on Windows or want to compile it manually, you can find
-the sources L<here|https://bitbucket.org/acoustid/chromaprint>.
+the sources at L<https://bitbucket.org/acoustid/chromaprint>.
 
 Open the F<Makefile.PL> and edit the C<LIBS> key to add C<chromaprint>:
 
