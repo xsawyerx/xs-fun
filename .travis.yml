@@ -10,7 +10,7 @@ perl:
     - "5.14"
 
 install:
-    - cpanm --notest Pod::Checker
+    - cpanm --notest Pod::Checker Test::MemoryGrowth
 
 script:
     - make test
