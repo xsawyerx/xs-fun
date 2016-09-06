@@ -1,5 +1,5 @@
 language: perl
-sudo: false
+sudo: true
 
 perl:
     - "5.24"
@@ -10,6 +10,7 @@ perl:
     - "5.14"
 
 install:
+    - sudo apt-get install libchromaprint-dev
     - cpanm --notest Pod::Checker Test::MemoryGrowth
 
 script:
