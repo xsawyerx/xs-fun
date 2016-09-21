@@ -111,7 +111,24 @@ behaves as we would wish.  Quit the debugger by typing C<q> at the prompt.
 
 =head2 Exporting our functions
 
+It'd be nicer to simply have to call C<add_numbers> or C<add_numbers_perl>
+without having to prefix them with the package name.  To do this we need to
+export the functions.
+
+Open F<lib/XSFun.pm> and fix the C<%EXPORT_TAGS> variable to include the
+functions we wish to export:
+
     our %EXPORT_TAGS = ( 'all' => [qw<add_numbers add_numbers_perl>] );
+
+If we now run C<make>, reload the debugger and load the library with
+
+    use XSFun qw(:all)
+
+then we will find that we can call the functions directly:
+
+      DB<2> print add_numbers(2, 3)
+    5
+      DB<3> q
 
 =head2 Testing
 
