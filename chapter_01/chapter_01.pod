@@ -132,8 +132,11 @@ then we will find that we can call the functions directly:
 
 =head2 Testing
 
-Let's write a small test script that shows off our spectacular code. Create
-a directory F<t> and inside it create the following file F<add_numbers.t>:
+Checking that things work by using the Perl debugger as a REPL is nice to
+quickly show that something worked, however it'd be heaps better if we could
+automate the process.  So, let's write a small test script that shows off
+our spectacular code. Create a directory F<t> and inside it create the
+following file F<add_numbers.t>:
 
     #!perl
     use strict;
@@ -159,17 +162,19 @@ a directory F<t> and inside it create the following file F<add_numbers.t>:
 
 Now let's run the tests:
 
-    perl Makefile.PL && make && make test
+    make test
 
-You can also run the following command to clean up your directory:
+You should see output similar to this:
 
-    make distclean
+    t/add_numbers.t .. ok
+    All tests successful.
+    Files=1, Tests=9,  0 wallclock secs ( 0.02 usr  0.01 sys +  0.02 cusr  0.00
+    csys =  0.05 CPU)
+    Result: PASS
 
-(if you're using Strawberry Perl on Windows, use C<dmake> instead of C<make>)
+=head3 Why use C<Test::More::is> instead of C<Test::More::cmp_ok>?
 
-I<Why use C<Test::More::is> instead of C<Test::More::cmp_ok>?>
-
-Usually we would use L<Test::More>'s C<cmp_ok()> to test numerical values, but
+Usually we would use C<Test::More>'s C<cmp_ok()> to test numerical values, but
 in this case we picked C<is()>. The reason is that the result we get back from
 our function has a different absolute value from the one we check for in the
 function, because of how Perl stores floating point values.
