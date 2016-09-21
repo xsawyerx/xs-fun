@@ -43,8 +43,23 @@ return a pointer to that.
             const double sum = SvNV(a) + SvNV(b);
             RETVAL = newSVnv(sum);
         }
-
         OUTPUT: RETVAL
+
+=head2 Building the project
+
+We're now in a position to build the project and compile the library.  As
+with many Perl modules one creates the C<Makefile> by running
+
+    perl Makefile.PL
+
+after which we merely need to run
+
+    make
+
+and our library is available within the C<blib> directory.
+
+Note that if you're using Strawberry Perl on Windows, use C<dmake> instead
+of C<make>.
 
 
 As soon as we compile our code, the function will be available to the
