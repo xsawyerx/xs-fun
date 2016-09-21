@@ -61,13 +61,54 @@ and our library is available within the C<blib> directory.
 Note that if you're using Strawberry Perl on Windows, use C<dmake> instead
 of C<make>.
 
+=head2 Playing with our shiny new library
 
-As soon as we compile our code, the function will be available to the
-B<XSFun> package and be callable as C<XSFun::add_numbers>.  However, in case
-we want users to call it as simply C<add_numbers>, we need to export it.
+Let's have a quick play with the library.  We can use the Perl debugger as a
+kind of
+L<REPL|https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop>
+by using the C<-de0> options to C<perl>, then we can use the library and try
+running the functions we've just defined.  Type the following into the
+console:
 
-Open F<lib/XSFun.pm> and fix the C<%EXPORT_TAGS> variable to include this new
-function:
+    perl -de0 -Iblib/lib -Iblib/arch
+
+The C<-I> options tell C<perl> where to look for the library files we just
+created with C<make>.  You will now see something like this:
+
+    Loading DB routines from perl5db.pl version 1.39_11
+    Editor support available.
+
+    Enter h or 'h h' for help, or 'man perldebug' for more help.
+
+    main::(-e:1):   0
+      DB<1>
+
+The C<< DB<x> >> is the prompt of our REPL; the number in the angle brackets
+will increment as we enter commands into the debugger.  Let's use the
+C<XSFun> module so that we can run our C<add_numbers> and
+C<add_numbers_perl> functions.
+
+Type
+
+    use XSFun
+
+at the command prompt.  You should simply see the prompt returned, which
+means that the library has been loaded successfully.  If an error occurred
+you might need to check the C<-I> options on the command line and/or rebuild
+the library; you can exit the debugger by entering C<q> at the prompt.
+
+Assuming all went well, we can see if we can add numbers together.  Since
+we've not yet exported the functions, we have to specify the functions along
+with the package name.  Try running the following commands at the prompt:
+
+    print XSFun::add_numbers(1, 2)
+    print XSFun::add_numbers(1.4, 3.2)
+
+As one would hope, we see the output C<3> and C<4.6> respectively.  Hooray!
+The C<add_numbers> function seems to work as expected.  Running similar
+commands on the C<add_numbers_perl> function also shows that this function
+behaves as we would wish.  Quit the debugger by typing C<q> at the prompt.
+
 =head2 Exporting our functions
 
     our %EXPORT_TAGS = ( 'all' => [qw<add_numbers add_numbers_perl>] );
