@@ -185,3 +185,13 @@ We can use C<sprintf()> to show the differences:
     7.3000000000000007105427357601001858711243
     7.2999999999999998223643160599749535322189
 
+=head2 Cleaning up
+
+Note that you can run the following command to clean up your directory:
+
+    make clean
+
+This will remove almost all files that have been automatically generated.
+To be more thorough, you can use
+
+    make realclean
