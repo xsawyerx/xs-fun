@@ -1,10 +1,10 @@
 =head1 Basic XS
 
+XS allows us to embed C code directly in the XS file. Hence, it doesn't need
+to be in a completely separate library. We can therefore write functions in
+C that will help us speed up our code. If we have a function that needs
+intensive calculation, moving that to C will give us much more speed.
 
-XS allows us to embed C code directly in the XS file. We don't have to
-separate it into an entire library. This helps us write functions in C that
-will help us speed up our code. If we have a function that needs intensive
-calculation, moving that to C will give us much more speed.
 =head2 Basic functions
 
 Let's add a function to our XS code.
