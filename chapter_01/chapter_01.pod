@@ -1,11 +1,11 @@
 =head1 Basic XS
 
-=head2 Basic Functions
 
 XS allows us to embed C code directly in the XS file. We don't have to
 separate it into an entire library. This helps us write functions in C that
 will help us speed up our code. If we have a function that needs intensive
 calculation, moving that to C will give us much more speed.
+=head2 Basic functions
 
 Let's add a function to our XS code.
 
@@ -27,7 +27,7 @@ We have a I<CODE> section which sets the return value (I<RETVAL>) to the sum
 of I<a> and I<b>. We also have an I<OUTPUT> section that indicates the output
 is the return value (I<RETVAL>).
 
-=head2 A Touch of Perl API
+=head2 A touch of Perl API
 
 Instead of working with pure C types, we can use Perl types. We can write a
 function that receives pointers to two SVs (Scalar Values) and returns an SV
@@ -44,7 +44,6 @@ return a pointer to that.
 
         OUTPUT: RETVAL
 
-=head2 Export our functions
 
 As soon as we compile our code, the function will be available to the
 B<XSFun> package and be callable as C<XSFun::add_numbers>.  However, in case
@@ -52,6 +51,7 @@ we want users to call it as simply C<add_numbers>, we need to export it.
 
 Open F<lib/XSFun.pm> and fix the C<%EXPORT_TAGS> variable to include this new
 function:
+=head2 Exporting our functions
 
     our %EXPORT_TAGS = ( 'all' => [qw<add_numbers add_numbers_perl>] );
 
