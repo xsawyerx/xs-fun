@@ -7,10 +7,12 @@ intensive calculation, moving that to C will give us much more speed.
 
 =head2 Basic functions
 
-Let's add a function to our XS code.
+Let's add a function to our XS code.  Create a new directory for this
+project and copy across the skeleton C<XSFun.xs>, C<Makefile.PL> and
+C<ppport.h> files from our initial template directory.
 
-Open the F<XSFun.xs> file from our skeleton and copy the following after the
-I<XS code> comment:
+Open the C<XSFun.xs> file and copy the following after the I<XS code>
+comment:
 
     double
     add_numbers(double a, double b)
