@@ -5,6 +5,11 @@ to be in a completely separate library. We can therefore write functions in
 C that will help us speed up our code. If we have a function that needs
 intensive calculation, moving that to C will give us much more speed.
 
+In this chapter we show how to create a basic C function in XS, how the same
+functionality can be achieved using Perl types, discuss simple interactive
+debugging strategies, and add automated tests of our newly created
+functions.
+
 =head2 Basic functions
 
 Let's add a function to our XS code.  Create a new directory for this
