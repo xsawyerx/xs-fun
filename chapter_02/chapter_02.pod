@@ -19,7 +19,7 @@ Open the F<Makefile.PL> and edit the C<LIBS> key to add C<chromaprint>:
 
 This will compile our code with I<Chromaprint>.
 
-=head2 The Smallest Function
+=head2 The smallest function
 
 Let's start with a simple function that fetches the library version. Add the
 following XS code to C<XSFun.xs>:
