@@ -1,14 +1,19 @@
 =head1 Mapping types
 
-XSUBs (XS functions) receive and return Perl's C data types (B<SV>, B<IV>,
-B<AV>, B<HV>, and so forth). If we want to return an B<int>, we will need
-to create an B<IV> with the value and return it. If we want to receive an
+XSUBs (XS functions) receive and return Perl's C data types: B<SV>,
+B<AV>, B<HV>, and so forth. If we want to return an B<int>, we will need
+to create an B<SV> with the value and return it. If we want to receive an
 B<int> we will need to translate an B<int> back to an B<SV>.
 
-Perl's XS layer provides a comfortable way to indicate how to translate
-these types (and any others you want) and have Perl's XS preprocessor
-add the translation code for you. B<TYPEMAP>s are the mechanism XS uses
-to automatically translate between different data types.
+These translations are very common and because of it, Perl's XS layer
+has a mechanism especially for that. In fact, it uses that mechanism to
+allow you to specify more specific types of B<SV> (such as B<IV> or B<NV>)
+in function declarations.
+
+Perl's XS translation mechanism provides a comfortable way to indicate how to
+translate these types (and any others you want) and have Perl's XS
+preprocessor add the translation code for you. B<TYPEMAP>s are the mechanism
+XS uses to automatically translate between different data types.
 
 You can create your own or use the default ones that Perl provides out
 of the box. In fact, we're using those already in our code.
