@@ -236,7 +236,7 @@ Let's write a test for our code. We can write the following as F<t/version.t>:
     isa_ok( $cp, 'Audio::Chromaprint' );
     can_ok( $cp, 'version'            );
 
-    is( $cp->version, '6.0.0', 'chromaprint version is 6.0.0' );
+    is( $cp->version, '1.2.0', 'chromaprint version is 1.2.0' );
 
 Try it out:
 
