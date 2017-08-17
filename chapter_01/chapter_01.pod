@@ -165,9 +165,10 @@ following file F<add_numbers.t>:
     is( add_numbers_perl( 3.1, 4.2 ), 7.3, '3.1 + 4.2 = 7.3' );
     is( add_numbers_perl( 3.2, 4.3 ), 7.5, '3.2 + 4.3 = 7.5' );
 
-Now let's run the tests:
+Now let's run the tests. Note that it's important to rebuild the F<Makefile> so C<make>
+knows about the newly added tests:
 
-    make test
+    perl Makefile.PL && make && make test
 
 You should see output similar to this:
 
