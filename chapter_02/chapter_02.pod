@@ -32,7 +32,7 @@ following XS code to C<XSFun.xs>:
             RETVAL = chromaprint_get_version();
         OUTPUT: RETVAL
 
-Let's add a test for it. Create a file F<version.t> with the following:
+Let's add a test for it. Create a file F<t/version.t> with the following:
 
     #!perl
 
